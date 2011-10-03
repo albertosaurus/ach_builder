@@ -1,5 +1,6 @@
 require 'active_support/inflector'
 require 'active_support/ordered_hash'
+require 'active_support/core_ext/hash/deep_merge'
 
 require "ach/version"
 
@@ -16,6 +17,8 @@ require 'ach/batch/control'
 require 'ach/file'
 require 'ach/file/header'
 require 'ach/file/control'
+require 'ach/builder'
+require 'ach/builder/blank_struct'
 
 module ACH
   def self.sample_file

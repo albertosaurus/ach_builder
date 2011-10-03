@@ -44,6 +44,14 @@ describe ACH::File do
     head.immediate_dest.should == '321321321'
     head.immediate_dest_name.should == 'BANK COMMERCE'
   end
+
+  it 'should be able to specify subcomponents with nested hash' do
+    header = {:header => {:immediate_dest => '321321321', :immediate_dest_name => 'BANK COMMERCE'}}
+    file = ACH::File.new(@attributes.merge(header))
+    head = file.header
+    head.immediate_dest.should == '321321321'
+    head.immediate_dest_name.should == 'BANK COMMERCE'
+  end
   
   it "should raise exception on unknown attribute assignement" do
     lambda {

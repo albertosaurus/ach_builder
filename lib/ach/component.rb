@@ -13,9 +13,15 @@ module ACH
     
     def initialize fields = {}, &block
       @attributes = {}
+      @components = Hash.new({})
       fields.each do |name, value|
-        raise UnknownAttribute.new(name) unless Formatter::RULES.key?(name)
-        @attributes[name] = value
+        if Formatter::RULES.key?(name)
+          @attributes[name] = value
+        elsif self.class.subcomponents.include?(name) and value.is_a?(Hash)
+          @components[name] = value
+        else
+          raise UnknownAttribute.new(name) 
+        end
       end
       after_initialize if respond_to?(:after_initialize)
       instance_eval(&block) if block
@@ -35,7 +41,7 @@ module ACH
     
     def header fields = {}, &block
       before_header
-      merged_fields = fields_for(self.class::Header).merge(fields)
+      merged_fields = fields_for(self.class::Header).merge(@components[:header]).merge(fields)
       @header ||= self.class::Header.new(merged_fields)
       @header.tap do |head|
         head.instance_eval(&block) if block
@@ -70,7 +76,10 @@ module ACH
         
         defaults = proc_defaults ? instance_exec(&proc_defaults) : {}
         
-        klass.new(fields_for(singular_name).merge(defaults).merge(index_or_fields)).tap do |component|
+        subcomonent = singular_name.to_sym
+        klass.subcomponents << subcomonent if klass.is_a? Component
+
+        klass.new(fields_for(singular_name).merge(defaults).merge(@components[subcomonent]).merge(index_or_fields)).tap do |component|
           component.instance_eval(&block) if block
           send(plural_name) << component
         end
@@ -79,6 +88,14 @@ module ACH
       define_method :after_initialize do
         instance_variable_set("@#{plural_name}", [])
       end
+    end
+
+    def self.subcomponents
+      class << self; @subcomponents ||= [:header]; end
+    end
+
+    def self.add_subcomponent(name)
+      subcomponents << name
     end
   end
 end

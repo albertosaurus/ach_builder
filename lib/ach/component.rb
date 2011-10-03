@@ -69,15 +69,14 @@ module ACH
       
       singular_name = plural_name.to_s.singularize
       klass = "ACH::#{singular_name.camelize}".constantize
+      subcomonent = singular_name.to_sym
+      self.subcomponents << subcomonent if klass < Component
       
       define_method(singular_name) do |*args, &block|
         index_or_fields = args.first || {}
         return send(plural_name)[index_or_fields] if Fixnum === index_or_fields
         
         defaults = proc_defaults ? instance_exec(&proc_defaults) : {}
-        
-        subcomonent = singular_name.to_sym
-        klass.subcomponents << subcomonent if klass.is_a? Component
 
         klass.new(fields_for(singular_name).merge(defaults).merge(@components[subcomonent]).merge(index_or_fields)).tap do |component|
           component.instance_eval(&block) if block

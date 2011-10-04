@@ -57,6 +57,12 @@ module ACH
       :amount                 => '->10',
       :check_serial_num       => '->10',  
       :discretionary_data     => '<-2-',
+
+      # Addenda Record
+      :addenda_type_code          => '->2' ,
+      :payment_related_info       => '<-80',
+      :addenda_sequence_num       => '->4' ,
+      :entry_details_sequence_num => '->7'
     }.freeze
     
     RULE_PARSER_REGEX = /^(<-|->)(\d+)(-)?(\|\w+)?$/

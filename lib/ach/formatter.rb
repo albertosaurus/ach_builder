@@ -50,14 +50,6 @@ module ACH
       :bank_39                => '<-39',
       :nines                  => '<-94',
 
-      # BOC Entry Details
-      :receiving_dfi_id       => '<-8-', # is it the same what origin_dfi_id is?
-      :check_digit            => '<-1' ,
-      :dfi_account_num        => '->17',
-      :amount                 => '->10',
-      :check_serial_num       => '->10',  
-      :discretionary_data     => '<-2-',
-
       # Addenda Record
       :addenda_type_code          => '->2' ,
       :payment_related_info       => '<-80',

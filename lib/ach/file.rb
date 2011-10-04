@@ -1,12 +1,15 @@
 module ACH
   class File < Component
     has_many :batches, lambda{ {:batch_number => batches.length + 1} }
+    add_subcomponent(:transmission_header)
 
     def transmission_header fields = {}, &block
-      merged_fields = fields_for(self.class::TranmissionHeader).merge(@subcomponents[:transmission_header]).merge(fields)
+      attrs = @subcomponents[:transmission_header].merge(fields)
+      return nil if attrs.empty? && !block
+      merged_fields = fields_for(self.class::TranmissionHeader).merge(attrs)
       @transmission_header ||= self.class::TranmissionHeader.new(merged_fields)
-      @transmission_header.tap do |th|
-        th.instance_eval(&block) if block
+      @transmission_header.tap do 
+        instance_eval(&block) if block
       end
     end
     
@@ -37,7 +40,7 @@ module ACH
     def to_ach
       extra = block_count * BLOCKING_FACTOR - file_entry_count
       tail = ([Tail.new] * extra).unshift(control)
-      [transmission_header, header] + batches.map(&:to_ach).flatten + tail
+      [transmission_header, header].compact + batches.map(&:to_ach).flatten + tail
     end
     
     def to_s!

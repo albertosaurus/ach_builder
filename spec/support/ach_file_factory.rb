@@ -25,8 +25,8 @@ class ACH::FileFactory
   end
 
 
-  def self.with_transmission_header
-    attrs = {:remote_id => 'ABCDEFGH', :application_id => '12345678'}
+  def self.with_transmission_header(custom_attrs)
+    attrs = {:remote_id => 'ABCDEFGH', :application_id => '12345678'}.merge(custom_attrs)
     sample_file(:transmission_header => attrs)
   end
 

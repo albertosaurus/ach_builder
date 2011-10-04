@@ -94,5 +94,28 @@ describe ACH::File do
   it "should have length devisible by 94 (record size)" do
     (@sample_file.to_s!.gsub("\r\n", '').length % ACH::Constants::RECORD_SIZE).should be_zero
   end
-end
 
+
+  describe 'tranmission header' do
+    before(:all) do
+      attrs = {:remote_id => 'ZYXWVUTS', :application_id => '98765432'}
+      ach_file = ACH::FileFactory.with_transmission_header(attrs)
+      @transmission_header = ach_file.to_s!.split("\r\n").first
+    end
+
+    it "has length of 38" do
+      @transmission_header.length.should == 38
+    end
+
+    it "has speicified remote_id" do
+      remote_id = @transmission_header[9..16]
+      remote_id.should == 'ZYXWVUTS'
+    end
+
+    it "has speicified application_id" do
+      app_id = @transmission_header[29..36]
+      app_id.should == '98765432'
+    end
+  end
+
+end

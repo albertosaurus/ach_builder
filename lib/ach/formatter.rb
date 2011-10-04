@@ -28,7 +28,7 @@ module ACH
       :immediate_origin_name  => '<-23',
       :reference_code         => '<-8',
       :service_class_code     => '<-3',
-      :company_name           => '<-16',
+      :company_name           => '<-16', # aka Idividual Name
       :company_note_data      => '<-20',
       :company_id             => '<-10',
       :entry_class_code       => '<-3',
@@ -48,7 +48,15 @@ module ACH
       :block_count            => '->6',
       :file_entry_count       => '->8',
       :bank_39                => '<-39',
-      :nines                  => '<-94'
+      :nines                  => '<-94',
+
+      # BOC Entry Details
+      :receiving_dfi_id       => '<-8-', # is it the same what origin_dfi_id is?
+      :check_digit            => '<-1' ,
+      :dfi_account_num        => '->17',
+      :amount                 => '->10',
+      :check_serial_num       => '->10',  
+      :discretionary_data     => '<-2-',
     }.freeze
     
     RULE_PARSER_REGEX = /^(<-|->)(\d+)(-)?(\|\w+)?$/

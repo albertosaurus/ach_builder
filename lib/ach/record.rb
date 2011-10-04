@@ -10,8 +10,8 @@ module ACH
     end
     
     class EmptyField < ArgumentError
-      def initialize field
-        super "Empty field '#{field}' for #{inspect}"
+      def initialize field, record
+        super "Empty field '#{field}' for #{record}"
       end
     end
     
@@ -58,7 +58,7 @@ module ACH
     
     def to_s!
       self.class.fields.map do |name|
-        raise EmptyField.new(name) if @fields[name].nil?
+        raise EmptyField.new(name, self) if @fields[name].nil?
         Formatter.format name, @fields[name]
       end.join
     end

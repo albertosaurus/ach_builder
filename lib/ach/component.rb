@@ -13,12 +13,12 @@ module ACH
     
     def initialize fields = {}, &block
       @attributes = {}
-      @components = Hash.new({})
+      @subcomponents = Hash.new({})
       fields.each do |name, value|
         if Formatter::RULES.key?(name)
           @attributes[name] = value
-        elsif self.class.subcomponents.include?(name) and value.is_a?(Hash)
-          @components[name] = value
+        elsif self.class.subcomponent_list.include?(name) and value.is_a?(Hash)
+          @subcomponents[name] = value
         else
           raise UnknownAttribute.new(name) 
         end
@@ -41,7 +41,7 @@ module ACH
     
     def header fields = {}, &block
       before_header
-      merged_fields = fields_for(self.class::Header).merge(@components[:header]).merge(fields)
+      merged_fields = fields_for(self.class::Header).merge(@subcomponents[:header]).merge(fields)
       @header ||= self.class::Header.new(merged_fields)
       @header.tap do |head|
         head.instance_eval(&block) if block
@@ -70,7 +70,7 @@ module ACH
       singular_name = plural_name.to_s.singularize
       klass = "ACH::#{singular_name.camelize}".constantize
       subcomonent = singular_name.to_sym
-      self.subcomponents << subcomonent if klass < Component
+      self.subcomponent_list << subcomonent if klass < Component
       
       define_method(singular_name) do |*args, &block|
         index_or_fields = args.first || {}
@@ -78,7 +78,7 @@ module ACH
         
         defaults = proc_defaults ? instance_exec(&proc_defaults) : {}
 
-        klass.new(fields_for(singular_name).merge(defaults).merge(@components[subcomonent]).merge(index_or_fields)).tap do |component|
+        klass.new(fields_for(singular_name).merge(defaults).merge(@subcomponents[subcomonent]).merge(index_or_fields)).tap do |component|
           component.instance_eval(&block) if block
           send(plural_name) << component
         end
@@ -89,12 +89,12 @@ module ACH
       end
     end
 
-    def self.subcomponents
-      class << self; @subcomponents ||= [:header]; end
+    def self.subcomponent_list
+      class << self; @subcomponent_list ||= [:header]; end
     end
 
     def self.add_subcomponent(name)
-      subcomponents << name
+      subcomponent_list << name
     end
   end
 end

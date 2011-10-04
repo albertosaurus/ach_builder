@@ -3,7 +3,7 @@ module ACH
     has_many :batches, lambda{ {:batch_number => batches.length + 1} }
 
     def transmission_header fields = {}, &block
-      merged_fields = fields_for(self.class::TranmissionHeader).merge(@component[:transmission_header]).merge(fields)
+      merged_fields = fields_for(self.class::TranmissionHeader).merge(@subcomponents[:transmission_header]).merge(fields)
       @transmission_header ||= self.class::TranmissionHeader.new(merged_fields)
       @transmission_header.tap do |th|
         th.instance_eval(&block) if block

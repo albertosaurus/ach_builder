@@ -28,7 +28,7 @@ module ACH
       :immediate_origin_name  => '<-23',
       :reference_code         => '<-8',
       :service_class_code     => '<-3',
-      :company_name           => '<-16',
+      :company_name           => '<-16', # aka Idividual Name
       :company_note_data      => '<-20',
       :company_id             => '<-10',
       :entry_class_code       => '<-3',
@@ -49,14 +49,22 @@ module ACH
       :file_entry_count       => '->8',
       :bank_39                => '<-39',
       :nines                  => '<-94',
+
+      # Tramission Header
       :request_type           => '<-9-',
       :remote_id              => '<-8-',
       :blank                  => '<-1-',
       :batch_id_parameter     => '<-4-',
-      :starting_single_quote  => '<-1',
+      :starting_single_quote  => '<-1' ,
       :file_type              => '<-6-',
-      :application_id         => '->8',
-      :ending_single_quote    => '<-1'
+      :application_id         => '->8' ,
+      :ending_single_quote    => '<-1' ,
+
+      # Addenda Record
+      :addenda_type_code          => '->2' ,
+      :payment_related_info       => '<-80',
+      :addenda_sequence_num       => '->4' ,
+      :entry_details_sequence_num => '->7'
     }.freeze
     
     RULE_PARSER_REGEX = /^(<-|->)(\d+)(-)?(\|\w+)?$/

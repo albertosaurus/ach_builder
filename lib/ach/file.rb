@@ -1,6 +1,15 @@
 module ACH
   class File < Component
     has_many :batches, lambda{ {:batch_number => batches.length + 1} }
+
+    def transmission_header fields = {}, &block
+      # Add @component[:name] here if you are merging it with builder branch
+      merged_fields = fields_for(self.class::TranmissionHeader).merge(fields)
+      @transmission_header ||= self.class::TranmissionHeader.new(merged_fields)
+      @transmission_header.tap do |th|
+        th.instance_eval(&block) if block
+      end
+    end
     
     def batch_count
       batches.length
@@ -29,7 +38,7 @@ module ACH
     def to_ach
       extra = block_count * BLOCKING_FACTOR - file_entry_count
       tail = ([Tail.new] * extra).unshift(control)
-      [header] + batches.map(&:to_ach).flatten + tail
+      [transmission_header, header] + batches.map(&:to_ach).flatten + tail
     end
     
     def to_s!

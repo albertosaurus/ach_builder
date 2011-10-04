@@ -48,7 +48,15 @@ module ACH
       :block_count            => '->6',
       :file_entry_count       => '->8',
       :bank_39                => '<-39',
-      :nines                  => '<-94'
+      :nines                  => '<-94',
+      :request_type           => '<-9-',
+      :remote_id              => '<-8-',
+      :blank                  => '<-1-',
+      :batch_id_parameter     => '<-4-',
+      :starting_single_quote  => '<-1',
+      :file_type              => '<-6-',
+      :application_id         => '->8',
+      :ending_single_quote    => '<-1'
     }.freeze
     
     RULE_PARSER_REGEX = /^(<-|->)(\d+)(-)?(\|\w+)?$/

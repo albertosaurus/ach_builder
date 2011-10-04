@@ -1,9 +1,9 @@
 module ACH
   # == Usage
   #   class CustomAchBuilder < ACH::Builder
-  #     default_options :file do
+  #     default_options do
   #       company_name "MY COMPANY"
-  #       default_options :batch do
+  #       batch do
   #         entry(:customer => "JOHN SMITH")
   #       end
   #     end
@@ -13,8 +13,8 @@ module ACH
   #     # Same what you do with ACH::File.new
   #   end
   class Builder
-    def self.default_options(component = :file, attrs = {}, &block)
-      bs = BlankStruct.new
+    def self.default_options(attrs = {}, &block)
+      bs = ACH::Builder::BlankStruct.new
       bs.instance_exec(&block) if block
       @opts_hash = attrs.deep_merge(bs.to_hash)
     end

@@ -5,7 +5,7 @@ describe ACH::Builder do
   before(:all) do
 
     @builder_class = Class.new(ACH::Builder) do
-      default_options :file do
+      default_options do
         company_name "Company name"
         batch do
           effective_date "20111001"
@@ -33,7 +33,7 @@ describe ACH::Builder do
 
     it 'accepts a hash of options' do
       builder = Class.new(ACH::Builder)
-      builder.default_options(:file, :band => 'Rainbow', :members => {:vocal => 'Dio', :guitar => 'Blackmore'}) do
+      builder.default_options(:band => 'Rainbow', :members => {:vocal => 'Dio', :guitar => 'Blackmore'}) do
         other_members(:vocal => 'Turner')
       end
       hash = builder.opts_hash

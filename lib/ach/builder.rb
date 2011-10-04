@@ -25,7 +25,7 @@ module ACH
 
     def self.build(fields = {}, &block)
       merged_fields = self.opts_hash.deep_merge(fields)
-      ACH::File.new(merged_fields)
+      ACH::File.new(merged_fields, &block)
     end
   end
 end

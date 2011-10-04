@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ACH::Batch do
   before(:each) do
     @batch = ACH::Batch.new
-    @file = ACH.sample_file
+    @file = ACH::FileFactory.sample_file
   end
   
   it "should create entry with attributes" do

@@ -14,7 +14,7 @@ describe ACH::File do
     @file_with_batch = ACH::File.new(@attributes) do
       batch :entry_class_code => 'WEB'
     end
-    @sample_file = ACH.sample_file
+    @sample_file = ACH::FileFactory.sample_file
   end
   
   it "should correctly assign attributes" do

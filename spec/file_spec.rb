@@ -118,4 +118,12 @@ describe ACH::File do
     end
   end
 
+  it 'number of records is multiple of 10 (tranmission header is ignored)' do
+    records = ACH::FileFactory.sample_file.to_s!.split("\r\n")
+    (records.size % 10).should == 0
+
+    records = ACH::FileFactory.with_transmission_header.to_s!.split("\r\n")
+    ((records.size - 1) % 10).should == 0
+  end
+
 end

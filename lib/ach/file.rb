@@ -18,7 +18,7 @@ module ACH
     end
     
     def block_count
-      (file_entry_addenda_count.to_f / BLOCKING_FACTOR).ceil
+      ((file_entry_addenda_count + batch_count*2 + 2).to_f / BLOCKING_FACTOR).ceil
     end
     
     def file_entry_addenda_count
@@ -38,7 +38,7 @@ module ACH
     end
     
     def to_ach
-      extra = block_count * BLOCKING_FACTOR - file_entry_addenda_count
+      extra = block_count * BLOCKING_FACTOR - file_entry_addenda_count - batch_count*2  - 2
       tail = ([Tail.new] * extra).unshift(control)
       [transmission_header, header].compact + batches.map(&:to_ach).flatten + tail
     end

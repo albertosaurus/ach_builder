@@ -30,6 +30,12 @@ file = ACH::File.new(:company_id => '11-11111', :company_name => 'MY COMPANY') d
         :routing_number    => '010010101',
         :bank_account      => '103030030'
     end
+    addenda do
+      addenda_type_code          '05'
+      payment_related_info       'foo bar'
+      addenda_sequence_num       1
+      entry_details_sequence_num 1
+    end
   end
 end
 

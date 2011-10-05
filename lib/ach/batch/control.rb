@@ -2,7 +2,7 @@ module ACH
   class Batch::Control < Record
     fields :record_type,
       :service_class_code,
-      :entry_count,
+      :entry_addenda_count,
       :entry_hash,
       :total_debit_amount,
       :total_credit_amount,

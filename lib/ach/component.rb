@@ -63,6 +63,12 @@ module ACH
         Hash[*(attrs.flatten)]
       end
     end
+
+    def after_initialize
+      self.class.after_initialize_hooks.each do |hook|
+        instance_exec(&hook)
+      end
+    end
     
     def self.has_many plural_name, proc_defaults = nil
       attr_reader plural_name
@@ -84,9 +90,7 @@ module ACH
         end
       end
       
-      define_method :after_initialize do
-        instance_variable_set("@#{plural_name}", [])
-      end
+      after_initialize_hooks << lambda { instance_variable_set("@#{plural_name}", []) }
     end
 
     def self.subcomponent_list
@@ -95,6 +99,10 @@ module ACH
 
     def self.add_subcomponent(name)
       subcomponent_list << name
+    end
+
+    def self.after_initialize_hooks
+      class << self; @after_initialize_hooks ||= []; end
     end
   end
 end

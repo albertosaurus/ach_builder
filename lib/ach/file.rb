@@ -18,11 +18,11 @@ module ACH
     end
     
     def block_count
-      (file_entry_count.to_f / BLOCKING_FACTOR).ceil
+      (file_entry_addenda_count.to_f / BLOCKING_FACTOR).ceil
     end
     
-    def file_entry_count
-      batches.map{ |b| b.entries.length }.inject(&:+) || 0
+    def file_entry_addenda_count
+      batches.map{ |b| b.entry_addenda_count }.inject(&:+) || 0
     end
     
     def entry_hash
@@ -38,7 +38,7 @@ module ACH
     end
     
     def to_ach
-      extra = block_count * BLOCKING_FACTOR - file_entry_count
+      extra = block_count * BLOCKING_FACTOR - file_entry_addenda_count
       tail = ([Tail.new] * extra).unshift(control)
       [transmission_header, header].compact + batches.map(&:to_ach).flatten + tail
     end
@@ -48,7 +48,7 @@ module ACH
     end
     
     def record_count
-      2 + batches.length * 2 + file_entry_count
+      2 + batches.length * 2 + file_entry_addenda_count
     end
     
     def write filename

@@ -3,7 +3,7 @@ module ACH
     fields :record_type,
       :batch_count,
       :block_count,
-      :file_entry_count,
+      :file_entry_addenda_count,
       :entry_hash,
       :total_debit_amount,
       :total_credit_amount,

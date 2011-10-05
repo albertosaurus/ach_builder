@@ -7,7 +7,7 @@ module ACH
       :company_id,
       :entry_class_code,
       :company_entry_descr,
-      :date,
+      :desc_date,
       :effective_date,
       :settlement_date,
       :origin_status_code,

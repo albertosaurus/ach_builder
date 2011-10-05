@@ -1,6 +1,7 @@
 module ACH
   class Batch < Component
     has_many :entries
+    has_many :addendas
     
     def has_credit?
       entries.any?(&:credit?)
@@ -10,8 +11,8 @@ module ACH
       entries.any?(&:debit?)
     end
     
-    def entry_count
-      entries.length
+    def entry_addenda_count
+      entries.size + addendas.size
     end
     
     def entry_hash
@@ -27,7 +28,7 @@ module ACH
     end
     
     def to_ach
-      [header] + entries + [control]
+      [header] + entries + addendas + [control]
     end
     
     def before_header

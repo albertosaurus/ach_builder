@@ -13,6 +13,7 @@ class ACH::FileFactory
       ['WEB', 'TEL'].each do |code|
         batch(:entry_class_code => code, :company_entry_descr => 'TV-TELCOM') do
           effective_date Time.now.strftime('%y%m%d')
+          desc_date      Time.now.strftime('%b %d').upcase
           origin_dfi_id "00000000"
           entry :customer_name => 'JOHN SMITH',
             :customer_acct     => '61242882282',

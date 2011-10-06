@@ -1,0 +1,52 @@
+$stderr.puts <<-NOTICE
+  
+  \033[31mNOTICE:\033[0m MetricFu is broken for ach_builder. But flay and reek work from the CLI.
+  
+    $ \033[32mflay .\033[0m
+    $ \033[32mreek .\033[0m
+    
+  NOTICE
+
+MetricFu::Configuration.run do |config|
+  config.code_dirs = ['.']
+  if RUBY_VERSION =~ /^1.9/ then
+    # RubyParser hangs on explicit block arguments: Racc::ParseError: parse error on value "," (tCOMMA)
+    # ref: http://rubyforge.org/tracker/index.php?func=detail&aid=28547&group_id=439&atid=1778
+    config.metrics -= [
+        :flog,
+        :rcov, # Doesn't support 1.9.2; use SimpleCov, or CoverMe
+        :saikuro, # Causes metric_fu to hang during charting, but does write a report
+      ]
+  end
+  config.metrics -= [
+      #:reek, # Can cause metric_fu to hang during charting, but does write a report; run `reek .` instead
+      #:roodi,
+      #:saikuro, # Causes metric_fu to hang during charting, but does write a report
+    ]
+  #config.metrics = [ :churn, :flay, :flog, :hotspots, :roodi, :stats ]
+  config.flay = {
+    :dirs_to_flay => config.code_dirs,
+    :minimum_score => 10
+  }
+  unless RUBY_VERSION =~ /^1.9/ then
+    config.flog[:dirs_to_flog] = config.code_dirs
+    config.saikuro[:input_directory] = config.code_dirs
+  end
+  config.reek[:dirs_to_reek] = config.code_dirs
+  config.roodi[:dirs_to_roodi] = config.code_dirs
+
+  unless RUBY_VERSION =~ /^1.9/ then
+    config.rcov[:rcov_opts] -= [
+      "--rails", 
+      "--exclude-only '.*'", 
+      "--include-file \"\\Aapp,\\Alib\""
+    ]
+    config.rcov[:rcov_opts] << ["--exclude /gems/,/Library/,/usr/,spec"]
+    config.rcov[:test_files] = [
+      'test/*_test.rb', 'test/**/*_test.rb',
+      'spec/*_spec.rb', 'spec/**/*_spec.rb'
+    ]
+    #$stderr.puts config.rcov.inspect
+  end 
+  # under 1.9.x: use SimpleCov or CoverMe without metric_fu, instead of rcov
+end

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe ACH::Builder::BlankStruct do
-  let(:struct) { ACH::Builder::BlankStruct.new }
+describe ACH::File::BlankStruct do
+  let(:struct) { ACH::File::BlankStruct.new }
 
   it "#method_missing adds new element" do
     struct.key_1 "value 1"  

@@ -4,8 +4,8 @@ module ACH
     include Constants
     
     class UnknownAttribute < ArgumentError
-      def initialize field
-        super "Unrecognized attribute '#{field}'"
+      def initialize field, obj
+        super "Unrecognized attribute '#{field}' for #{obj}"
       end
     end
     
@@ -20,7 +20,7 @@ module ACH
         elsif self.class.subcomponent_list.include?(name) and value.is_a?(Hash)
           @subcomponents[name] = value
         else
-          raise UnknownAttribute.new(name) 
+          raise UnknownAttribute.new(name, self)
         end
       end
       after_initialize if respond_to?(:after_initialize)
@@ -65,9 +65,7 @@ module ACH
     end
 
     def after_initialize
-      self.class.after_initialize_hooks.each do |hook|
-        instance_exec(&hook)
-      end
+      self.class.after_initialize_hooks.each{ |hook| instance_exec(&hook) }
     end
     
     def self.has_many plural_name, proc_defaults = nil
@@ -76,7 +74,7 @@ module ACH
       singular_name = plural_name.to_s.singularize
       klass = "ACH::#{singular_name.camelize}".constantize
       subcomponent = singular_name.to_sym
-      self.subcomponent_list << subcomponent if klass < Component
+      self.subcomponent_list << subcomponent if klass < Component || klass < Record
       
       define_method(singular_name) do |*args, &block|
         index_or_fields = args.first || {}
@@ -95,10 +93,6 @@ module ACH
 
     def self.subcomponent_list
       class << self; @subcomponent_list ||= [:header]; end
-    end
-
-    def self.add_subcomponent(name)
-      subcomponent_list << name
     end
 
     def self.after_initialize_hooks

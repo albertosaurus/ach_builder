@@ -126,4 +126,36 @@ describe ACH::File do
     ((records.size - 1) % 10).should == 0
   end
 
+  describe 'inherited class' do
+    before(:all) do
+      @custom_file_class = Class.new(ACH::File) do
+        immediate_dest_name 'CUSTOM VALUE'
+        batch do
+          entry(:customer_name => "PETER PARKER")
+        end
+      end
+
+      @custom_file = @custom_file_class.new do
+        immediate_dest '123123123'
+        immediate_origin '123123123'
+        immediate_origin_name 'MYCOMPANY'
+        batch(:entry_class_code => "WEB", :company_entry_descr => 'TV-TELCOM') do
+          effective_date Time.now.strftime('%y%m%d')
+          desc_date      Time.now.strftime('%b %d').upcase
+          origin_dfi_id "00000000"
+          entry :customer_acct     => '61242882282',
+                :amount            => '2501',
+                :routing_number    => '010010101',
+                :bank_account      => '103030030'
+        end
+      end
+    end
+
+    it 'should use default values defined in inherited class' do
+      header = @custom_file.header
+      header.immediate_dest_name.should == "CUSTOM VALUE"
+      entry = @custom_file.batches.first.entries.first
+      entry.customer_name.should == "PETER PARKER"
+    end
+  end
 end

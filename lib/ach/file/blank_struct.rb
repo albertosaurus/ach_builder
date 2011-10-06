@@ -1,5 +1,5 @@
 module ACH
-  class Builder
+  class File
     class BlankStruct
       instance_methods.each { |m| undef_method m unless m =~ /^(__send__|__id__|instance_exec|is_a\?|tap)$/ }
 
@@ -13,14 +13,14 @@ module ACH
       end
 
       def method_missing(meth, *args, &block)
-        hash_or_value = args.first
-        if hash_or_value.is_a? Hash
-          @hash[meth.to_sym] = BlankStruct.new(hash_or_value)
+        attr, value = meth.to_sym, args.first
+        if block_given?
+          @hash[attr] = BlankStruct.new.tap{|bs| bs.instance_exec(&block)} 
         else
-          @hash[meth.to_sym] = hash_or_value
+          @hash[attr] = value.is_a?(Hash) ? BlankStruct.new(value) : value
         end
-        @hash[meth.to_sym] = BlankStruct.new.tap{|bs| bs.instance_exec(&block)} if block_given?
       end
+
     end
   end
 end

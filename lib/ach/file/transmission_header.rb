@@ -1,5 +1,5 @@
 module ACH
-  class File::TranmissionHeader < Record
+  class File::TransmissionHeader < Record
     fields :request_type,
            :remote_id,
            :blank,

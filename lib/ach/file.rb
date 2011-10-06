@@ -26,8 +26,8 @@ module ACH
     def transmission_header fields = {}, &block
       attrs = @subcomponents[:transmission_header].merge(fields)
       return nil if attrs.empty? && !block
-      merged_fields = fields_for(self.class::TranmissionHeader).merge(attrs)
-      @transmission_header ||= self.class::TranmissionHeader.new(merged_fields)
+      merged_fields = fields_for(self.class::TransmissionHeader).merge(attrs)
+      @transmission_header ||= self.class::TransmissionHeader.new(merged_fields)
       @transmission_header.tap do 
         instance_eval(&block) if block
       end

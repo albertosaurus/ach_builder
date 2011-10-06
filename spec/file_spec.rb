@@ -96,7 +96,7 @@ describe ACH::File do
   end
 
 
-  describe 'tranmission header' do
+  describe 'transmission header' do
     before(:all) do
       attrs = {:remote_id => 'ZYXWVUTS', :application_id => '98765432'}
       ach_file = ACH::FileFactory.with_transmission_header(attrs)
@@ -107,18 +107,18 @@ describe ACH::File do
       @transmission_header.length.should == 38
     end
 
-    it "has speicified remote_id" do
+    it "has specified remote_id" do
       remote_id = @transmission_header[9..16]
       remote_id.should == 'ZYXWVUTS'
     end
 
-    it "has speicified application_id" do
+    it "has specified application_id" do
       app_id = @transmission_header[29..36]
       app_id.should == '98765432'
     end
   end
 
-  it 'number of records is multiple of 10 (tranmission header is ignored)' do
+  it 'number of records is multiple of 10 (transmission header is ignored)' do
     records = ACH::FileFactory.sample_file.to_s!.split("\r\n")
     (records.size % 10).should == 0
 

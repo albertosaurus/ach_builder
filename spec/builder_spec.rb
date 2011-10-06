@@ -50,7 +50,7 @@ describe ACH::Builder do
       @builder_class.should respond_to :build
     end
 
-    it "should delegates to File#new merging default values with passed fields" do
+    it "should delegate to File#new, merging default values with passed fields" do
       expeted_arg = {:company_name => 'CN', :batch => {:effective_date => '20111001', :entry => {:customer_name => 'JOHN SMITH'}}}
       ACH::File.stub!(:new)
       ACH::File.should_receive(:new).with(expeted_arg)

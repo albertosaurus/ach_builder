@@ -28,7 +28,7 @@ module ACH
       :immediate_origin_name    => '<-23',
       :reference_code           => '<-8',
       :service_class_code       => '<-3',
-      :company_name             => '<-16', # aka Idividual Name
+      :company_name             => '<-16', # aka Individual Name
       :company_note_data        => '<-20',
       :company_id               => '<-10',
       :entry_class_code         => '<-3',
@@ -51,17 +51,17 @@ module ACH
       :nines                    => '<-94',
 
       # Batch header
-      :desc_date              => '<-6-', # company descriptive date
+      :desc_date                => '<-6-', # company descriptive date
 
-      # Tramission Header
-      :request_type           => '<-9-',
-      :remote_id              => '<-8-',
-      :blank                  => '<-1-',
-      :batch_id_parameter     => '<-4-',
-      :starting_single_quote  => '<-1' ,
-      :file_type              => '<-6-',
-      :application_id         => '->8' ,
-      :ending_single_quote    => '<-1' ,
+      # Transmission Header
+      :request_type             => '<-9-',
+      :remote_id                => '<-8-',
+      :blank                    => '<-1-',
+      :batch_id_parameter       => '<-4-',
+      :starting_single_quote    => '<-1' ,
+      :file_type                => '<-6-',
+      :application_id           => '->8' ,
+      :ending_single_quote      => '<-1' ,
 
       # Addenda Record
       :addenda_type_code          => '->2' ,

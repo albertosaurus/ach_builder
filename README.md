@@ -1,6 +1,6 @@
 #ACH-Builder
 
-Ruby helper for creating ACH files. It's API is designed to be as flexible as possible.
+Ruby helper for creating ACH files. Its API is designed to be as flexible as possible.
 
 Inspired by
 

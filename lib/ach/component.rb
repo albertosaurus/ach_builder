@@ -1,8 +1,19 @@
 module ACH
+  # Base class for {ACH::File} and {ACH::Batch}. Every component has its own 
+  # number of entities, header and control records. So it provides 
+  # {ACH::Component#header}, {ACH::Component#control}, {ACH::Component.has_many}
+  # methods to manage them.
+  #
+  # == Example:
+  #    class File < Component
+  #      has_many :batches
+  #      # implementation
+  #    end
   class Component
     include Validations
     include Constants
     
+    # Exception which raises on attempt to assign a value to nonexistent field.
     class UnknownAttribute < ArgumentError
       def initialize field, obj
         super "Unrecognized attribute '#{field}' for #{obj}"
@@ -39,6 +50,19 @@ module ACH
     end
     private :before_header
     
+    # Sets header fields if fields or block passed. Returns header record.
+    #
+    # = Example 1:
+    #   header :foo => "value 1", :bar => "value 2"
+    #
+    # = Example 2:
+    #   header do
+    #     foo "value 1"
+    #     bar "value 2"
+    #   end
+    #
+    # = Example 3:
+    #   header # => just returns a header object
     def header fields = {}, &block
       before_header
       merged_fields = fields_for(self.class::Header).merge(@subcomponents[:header]).merge(fields)
@@ -48,6 +72,7 @@ module ACH
       end
     end
     
+    # Returns a control record object
     def control
       klass = self.class::Control
       fields = klass.fields.select{ |f| respond_to?(f) || attributes[f] }
@@ -68,6 +93,20 @@ module ACH
       self.class.after_initialize_hooks.each{ |hook| instance_exec(&hook) }
     end
     
+    # Creates has many association.
+    # = Example:
+    #    class File < Component
+    #      has_many :batches
+    #    end
+    #
+    #    file = File.new do
+    #      batch :foo => 1, :bar => 2
+    #    end
+    #
+    #    file.batches  # => [#<Batch ...>]
+    # The example above extends File with #batches and #batch instance methods:
+    # * #batch is used to add new instance of Batch.
+    # * #batches is used to get an array of batches which belong to file.
     def self.has_many plural_name, proc_defaults = nil
       attr_reader plural_name
       

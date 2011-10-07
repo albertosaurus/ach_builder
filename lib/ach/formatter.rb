@@ -1,4 +1,18 @@
 module ACH
+  # Every field should be formatted with its own rule so Formatter take care about it.
+  # Rules are defined in ACH::RULES constant.
+  #
+  # == Rule format:
+  # Every rule can contain the next items:
+  # * _justification_  - "<-" or "->".
+  # * _width_          - a number of characters for a field.
+  # * _padding_        - if "-" setted pads with spaces otherwise uses zeros.
+  # * _transformation_ - allows to call method on a string. Pipe must precedes a method name. Foe example: "|upcase".
+  # For real examples see RULES constants.
+  #
+  # == Usage example:
+  #    ACH::Formatter.format(:customer_name, "LINUS TORVALDS")  # => "LINUS TORVALDS        "
+  #    ACH::Formatter.format(:amount, 52)                       # => "0000000052"
   module Formatter
     extend self
     

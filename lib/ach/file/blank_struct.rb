@@ -1,5 +1,13 @@
 module ACH
   class File
+    # BlankStruct is used to build hash using blocks.
+    # == Example:
+    #   bs = BlankStruct.new(:first_level => 1)
+    #   bs.second_level do
+    #     foo "foo value"
+    #     bar "bar value"
+    #   end
+    #   bs.to_hash # => {:first_level=>1, :second_level=>{:bar=>"bar value", :foo=>"foo value"}}
     class BlankStruct
       instance_methods.each { |m| undef_method m unless m =~ /^(__send__|__id__|instance_exec|is_a\?|tap)$/ }
 

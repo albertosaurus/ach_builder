@@ -88,11 +88,6 @@ module ACH
     }.freeze
     
     
-    def format field_name, value
-      compile_rule(field_name) unless compiled_rules.key?(field_name)
-      compiled_rules[field_name].call(value)
-    end
-    
     def method_missing meth, *args
       if RULES.key? meth
         format meth, *args
@@ -100,10 +95,14 @@ module ACH
         super
       end
     end
-    
-    def compile_rule field_name
-      compiled_rules[field_name] = Rule.new(RULES[field_name]).to_proc
+
+    def format field_name, value
+      rule_for_field(field_name).call(value)
     end
-    private :compile_rule
+    
+    def rule_for_field(field)
+      compiled_rules[field] ||= Rule.new(RULES[field]).to_proc
+    end
+    private :rule_for_field
   end
 end

@@ -58,10 +58,10 @@ module ACH
     def self.define_field_methods(field)
       raise UnknownField.new(field, name) unless Formatter::RULES.key?(field)
       define_method(field) do |*args|
-        args.empty? ? fields[field] : (fields[field] = args.first)
+        args.empty? ? @fields[field] : (@fields[field] = args.first)
       end
       define_method("#{field}=") do |val|
-        fields[field] = val
+        @fields[field] = val
       end
     end
     private_class_method :define_field_methods

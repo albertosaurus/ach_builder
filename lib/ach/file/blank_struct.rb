@@ -17,7 +17,7 @@ module ACH
     def to_hash
       return @hash if @hash.empty?
       @hash.inject({}) do |hash, (key, val)|
-        hash[key] = (val.is_a?(self.class) ? val.to_hash : val)
+        hash[key] = (val.is_a?(File::BlankStruct) ? val.to_hash : val)
         hash
       end
     end
@@ -25,9 +25,9 @@ module ACH
     def method_missing(meth, *args, &block)
       attr, value = meth.to_sym, args.first
       if block_given?
-        @hash[attr] = self.class.new.tap{|bs| bs.instance_exec(&block)} 
+        @hash[attr] = File::BlankStruct.new.tap{|bs| bs.instance_exec(&block)} 
       else
-        @hash[attr] = value.is_a?(Hash) ? self.class.new(value) : value
+        @hash[attr] = value.is_a?(Hash) ? File::BlankStruct.new(value) : value
       end
     end
 

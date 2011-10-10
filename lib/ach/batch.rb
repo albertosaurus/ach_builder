@@ -18,7 +18,7 @@ module ACH
     end
     
     def entry_hash
-      entries.map{ |e| e.routing_number.to_i / 10 }.compact.inject(&:+)
+      entries.map{ |entry| entry.routing_number.to_i / 10 }.compact.inject(&:+)
     end
     
     def total_debit_amount
@@ -38,7 +38,7 @@ module ACH
     end
 
     def amount_sum_for(meth)
-      entries.select(&meth).map{ |e| e.amount.to_i }.compact.inject(&:+) || 0
+      entries.select(&meth).map{ |entry| entry.amount.to_i }.compact.inject(&:+) || 0
     end
     private :amount_sum_for
   end

@@ -75,7 +75,7 @@ module ACH
     end
     
     def file_entry_addenda_count
-      batches.map{ |b| b.entry_addenda_count }.inject(&:+) || 0
+      batches.map{ |batch| batch.entry_addenda_count }.inject(&:+) || 0
     end
     
     def entry_hash

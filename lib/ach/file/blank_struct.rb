@@ -8,7 +8,7 @@ module ACH
   #   end
   #   bs.to_hash # => {:first_level=>1, :second_level=>{:bar=>"bar value", :foo=>"foo value"}}
   class File::BlankStruct
-    instance_methods.each { |m| undef_method m unless m =~ /^(__send__|__id__|instance_exec|is_a\?|tap|class)$/ }
+    instance_methods.each { |meth| undef_method meth unless meth =~ /^(__send__|__id__|instance_exec|is_a\?|tap|class)$/ }
 
     def initialize(hash = {})
       @hash = hash
@@ -16,7 +16,10 @@ module ACH
 
     def to_hash
       return @hash if @hash.empty?
-      @hash.inject({}){ |h,(k,v)| h[k] = (v.is_a?(self.class) ? v.to_hash : v) ; h}
+      @hash.inject({}) do |hash, (key, val)|
+        hash[key] = (val.is_a?(self.class) ? val.to_hash : val)
+        hash
+      end
     end
 
     def method_missing(meth, *args, &block)

@@ -2,6 +2,7 @@ require 'active_support/inflector'
 require 'active_support/ordered_hash'
 require 'active_support/core_ext/hash/deep_merge'
 require 'active_support/core_ext/module/attribute_accessors'
+require 'active_support/core_ext/class/attribute'
 
 require "ach/version"
 

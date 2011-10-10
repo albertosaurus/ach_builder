@@ -20,7 +20,16 @@ module ACH
       end
     end
     
+    class_attribute :after_initialize_hooks, :subcomponent_list
+    self.after_initialize_hooks = []
+    self.subcomponent_list      = [:header]
+
     attr_reader :attributes
+
+    def self.inherited(klass)
+      klass.after_initialize_hooks = after_initialize_hooks.dup
+      klass.subcomponent_list      = subcomponent_list.dup
+    end
     
     def initialize fields = {}, &block
       @attributes = {}
@@ -128,14 +137,6 @@ module ACH
       end
       
       after_initialize_hooks << lambda { instance_variable_set("@#{plural_name}", []) }
-    end
-
-    def self.subcomponent_list
-      class << self; @subcomponent_list ||= [:header]; end
-    end
-
-    def self.after_initialize_hooks
-      class << self; @after_initialize_hooks ||= []; end
     end
   end
 end

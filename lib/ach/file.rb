@@ -43,11 +43,6 @@ module ACH
       default_opts[meth.to_sym] = attrs_or_value
     end
 
-    def self.inherited(klass)
-      after_initialize_hooks.each{ |hook| klass.after_initialize_hooks << hook }
-      subcomponent_list.each{ |subcomp| klass.subcomponent_list << subcomp }
-    end
-
     def self.default_opts
       class << self; @default_opts ||= {}; end
     end

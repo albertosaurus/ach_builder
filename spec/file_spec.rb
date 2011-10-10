@@ -80,15 +80,13 @@ describe ACH::File do
   end
   
   it "should have correct record count" do
-    @sample_file.record_count.should == 8
+    @sample_file.record_count.should == 10
   end
   
-  it "should have header record with length of 94" do
-    @sample_file.header.to_s!.length.should == ACH::Constants::RECORD_SIZE
-  end
-  
-  it "should have control record with length of 94" do
-    @sample_file.control.to_s!.length.should == ACH::Constants::RECORD_SIZE
+  it "should have header and control record with length of 94" do
+    [:header, :control].each do |record|
+      @sample_file.send(record).to_s!.length.should == ACH::Constants::RECORD_SIZE
+    end
   end
   
   it "should have length devisible by 94 (record size)" do
@@ -108,13 +106,11 @@ describe ACH::File do
     end
 
     it "has specified remote_id" do
-      remote_id = @transmission_header[9..16]
-      remote_id.should == 'ZYXWVUTS'
+      @transmission_header[9..16].should == 'ZYXWVUTS'
     end
 
     it "has specified application_id" do
-      app_id = @transmission_header[29..36]
-      app_id.should == '98765432'
+      @transmission_header[29..36].should == '98765432'
     end
   end
 

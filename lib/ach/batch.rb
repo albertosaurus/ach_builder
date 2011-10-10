@@ -22,11 +22,11 @@ module ACH
     end
     
     def total_debit_amount
-      entries.select(&:debit?).map{ |e| e.amount.to_i }.compact.inject(&:+) || 0
+      amount_sum_for(:debit?)
     end
     
     def total_credit_amount
-      entries.select(&:credit?).map{ |e| e.amount.to_i }.compact.inject(&:+) || 0
+      amount_sum_for(:credit?)
     end
     
     def to_ach
@@ -36,5 +36,10 @@ module ACH
     def before_header
       attributes[:service_class_code] ||= (has_debit? && has_credit? ? 200 : has_debit? ? 225 : 220)
     end
+
+    def amount_sum_for(meth)
+      entries.select(&meth).map{ |e| e.amount.to_i }.compact.inject(&:+) || 0
+    end
+    private :amount_sum_for
   end
 end

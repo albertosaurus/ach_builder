@@ -15,11 +15,15 @@ class ACH::FileFactory
           effective_date Time.now.strftime('%y%m%d')
           desc_date      Time.now.strftime('%b %d').upcase
           origin_dfi_id "00000000"
-          entry :customer_name => 'JOHN SMITH',
-            :customer_acct     => '61242882282',
-            :amount            => '2501',
-            :routing_number    => '010010101',
-            :bank_account      => '103030030'
+          entry :customer_name  => 'JOHN SMITH',
+                :customer_acct  => '61242882282',
+                :amount         => '2501',
+                :routing_number => '010010101',
+                :bank_account   => '103030030'
+          addenda :addenda_type_code          => '05',
+                  :payment_related_info       => 'foo bar',
+                  :addenda_sequence_num       => 1,
+                  :entry_details_sequence_num => 1
         end
       end
     end

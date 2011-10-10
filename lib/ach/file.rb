@@ -79,15 +79,15 @@ module ACH
     end
     
     def entry_hash
-      batches.map(&:entry_hash).compact.inject(&:+)
+      batch_sum_of(:entry_hash)
     end
     
     def total_debit_amount
-      batches.map(&:total_debit_amount).compact.inject(&:+)
+      batch_sum_of(:total_debit_amount)
     end
     
     def total_credit_amount
-      batches.map(&:total_credit_amount).compact.inject(&:+)
+      batch_sum_of(:total_credit_amount)
     end
     
     def to_ach
@@ -110,5 +110,10 @@ module ACH
         fh.write(to_s!)
       end
     end
+
+    def batch_sum_of(meth)
+      batches.map(&meth).compact.inject(&:+)
+    end
+    private :batch_sum_of
   end
 end

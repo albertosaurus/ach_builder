@@ -1,5 +1,5 @@
+# Generates ACH files for tests
 class ACH::FileFactory
-
   def self.sample_file(custom_attrs = {})
     attrs = {:company_id => '11-11111', :company_name => 'MY COMPANY'}
     attrs.merge!(custom_attrs)

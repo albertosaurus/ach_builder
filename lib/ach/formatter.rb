@@ -87,7 +87,6 @@ module ACH
       :entry_details_sequence_num => '->7'
     }.freeze
     
-    RULE_PARSER_REGEX = /^(<-|->)(\d+)(-)?(\|\w+)?$/
     
     def format field_name, value
       compile_rule(field_name) unless compiled_rules.key?(field_name)
@@ -103,15 +102,7 @@ module ACH
     end
     
     def compile_rule field_name
-      just, width, pad, transf = RULES[field_name].match(RULE_PARSER_REGEX)[1..-1]
-      padmethod = just == '<-' ? :ljust : :rjust
-      length = width.to_i
-      padstr = padmethod == :ljust ? ' ' : pad == '-' ? ' ' : '0'
-      transform = transf[1..-1] if transf
-      compiled_rules[field_name] = lambda{ |val|
-        val = val.to_s[0..length]
-        (transform ? val.send(transform) : val).send(padmethod, length, padstr)
-      }
+      compiled_rules[field_name] = Rule.new(RULES[field_name]).to_proc
     end
     private :compile_rule
   end

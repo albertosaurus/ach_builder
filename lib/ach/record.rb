@@ -43,17 +43,7 @@ module ACH
     def self.fields *field_names
       return @fields if field_names.empty?
       @fields = field_names
-      @fields.each do |field|
-        raise UnknownField.new(field, name) unless Formatter::RULES.key?(field)
-        
-        define_method(field) do |*args|
-          args.empty? ? fields[field] : (fields[field] = args.first)
-        end
-        
-        define_method("#{field}=") do |val|
-          fields[field] = val
-        end
-      end
+      @fields.each{ |field| define_field_methods(field) }
     end
     
     # Sets default values for fields.
@@ -64,6 +54,17 @@ module ACH
       return @defaults if default_values.nil?
       @defaults = default_values.freeze
     end
+
+    def self.define_field_methods(field)
+      raise UnknownField.new(field, name) unless Formatter::RULES.key?(field)
+      define_method(field) do |*args|
+        args.empty? ? fields[field] : (fields[field] = args.first)
+      end
+      define_method("#{field}=") do |val|
+        fields[field] = val
+      end
+    end
+    private_class_method :define_field_methods
     
     def initialize fields = {}, &block
       defaults.each do |key, value|

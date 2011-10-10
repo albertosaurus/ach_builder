@@ -7,6 +7,7 @@ require "ach/version"
 
 require 'ach/constants'
 require 'ach/formatter'
+require 'ach/formatter/rule'
 require 'ach/validations'
 require 'ach/component'
 require 'ach/record'

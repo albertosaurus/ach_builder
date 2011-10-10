@@ -5,18 +5,18 @@ describe ACH::Formatter do
     module ACH::Formatter
       # redefining RULES FOR new test values
       RULES = remove_const(:RULES).dup
-      RULES[:ljust_10] = '<-10'
-      RULES[:ljust_10_transform] = '<-10|upcase'
-      RULES[:rjust_10] = '->10'
-      RULES[:rjust_10_spaced] = '->10-'
+      RULES[:ljust_5] = '<-5'
+      RULES[:ljust_5_transform] = '<-5|upcase'
+      RULES[:rjust_6] = '->6'
+      RULES[:rjust_6_spaced] = '->6-'
     end
   end
   
-  it{ ACH::Formatter.ljust_10('FOO').should == 'FOO'.ljust(10) }
+  it{ ACH::Formatter.ljust_5('foo').should == 'foo  ' }
   
-  it{ ACH::Formatter.ljust_10_transform('foo').should == 'FOO'.ljust(10) }
+  it{ ACH::Formatter.ljust_5_transform('bar').should == 'BAR  ' }
   
-  it{ ACH::Formatter.rjust_10(1599).should == '1599'.rjust(10, '0') }
+  it{ ACH::Formatter.rjust_6(1599).should == '001599' }
   
-  it{ ACH::Formatter.rjust_10_spaced(1599).should == '1599'.rjust(10) }
+  it{ ACH::Formatter.rjust_6_spaced(1599).should == '  1599' }
 end

@@ -14,7 +14,7 @@ describe ACH::File do
     @file_with_batch = ACH::File.new(@attributes) do
       batch :entry_class_code => 'WEB'
     end
-    @sample_file = ACH.sample_file
+    @sample_file = ACH::FileFactory.sample_file
   end
   
   it "should correctly assign attributes" do
@@ -40,6 +40,14 @@ describe ACH::File do
         immediate_dest_name 'BANK COMMERCE'
       end
     end
+    head = file.header
+    head.immediate_dest.should == '321321321'
+    head.immediate_dest_name.should == 'BANK COMMERCE'
+  end
+
+  it 'should be able to specify subcomponents with nested hash' do
+    header = {:header => {:immediate_dest => '321321321', :immediate_dest_name => 'BANK COMMERCE'}}
+    file = ACH::File.new(@attributes.merge(header))
     head = file.header
     head.immediate_dest.should == '321321321'
     head.immediate_dest_name.should == 'BANK COMMERCE'
@@ -72,19 +80,78 @@ describe ACH::File do
   end
   
   it "should have correct record count" do
-    @sample_file.record_count.should == 8
+    @sample_file.record_count.should == 10
   end
   
-  it "should have header record with length of 94" do
-    @sample_file.header.to_s!.length.should == ACH::Constants::RECORD_SIZE
-  end
-  
-  it "should have control record with length of 94" do
-    @sample_file.control.to_s!.length.should == ACH::Constants::RECORD_SIZE
+  it "should have header and control record with length of 94" do
+    [:header, :control].each do |record|
+      @sample_file.send(record).to_s!.length.should == ACH::Constants::RECORD_SIZE
+    end
   end
   
   it "should have length devisible by 94 (record size)" do
     (@sample_file.to_s!.gsub("\r\n", '').length % ACH::Constants::RECORD_SIZE).should be_zero
   end
-end
 
+
+  describe 'transmission header' do
+    before(:all) do
+      attrs = {:remote_id => 'ZYXWVUTS', :application_id => '98765432'}
+      ach_file = ACH::FileFactory.with_transmission_header(attrs)
+      @transmission_header = ach_file.to_s!.split("\r\n").first
+    end
+
+    it "has length of 38" do
+      @transmission_header.length.should == 38
+    end
+
+    it "has specified remote_id" do
+      @transmission_header[9..16].should == 'ZYXWVUTS'
+    end
+
+    it "has specified application_id" do
+      @transmission_header[29..36].should == '98765432'
+    end
+  end
+
+  it 'number of records is multiple of 10 (transmission header is ignored)' do
+    records = ACH::FileFactory.sample_file.to_s!.split("\r\n")
+    (records.size % 10).should == 0
+
+    records = ACH::FileFactory.with_transmission_header.to_s!.split("\r\n")
+    ((records.size - 1) % 10).should == 0
+  end
+
+  describe 'inherited class' do
+    before(:all) do
+      @custom_file_class = Class.new(ACH::File) do
+        immediate_dest_name 'CUSTOM VALUE'
+        batch do
+          entry(:customer_name => "PETER PARKER")
+        end
+      end
+
+      @custom_file = @custom_file_class.new do
+        immediate_dest '123123123'
+        immediate_origin '123123123'
+        immediate_origin_name 'MYCOMPANY'
+        batch(:entry_class_code => "WEB", :company_entry_descr => 'TV-TELCOM') do
+          effective_date Time.now.strftime('%y%m%d')
+          desc_date      Time.now.strftime('%b %d').upcase
+          origin_dfi_id "00000000"
+          entry :customer_acct     => '61242882282',
+                :amount            => '2501',
+                :routing_number    => '010010101',
+                :bank_account      => '103030030'
+        end
+      end
+    end
+
+    it 'should use default values defined in inherited class' do
+      header = @custom_file.header
+      header.immediate_dest_name.should == "CUSTOM VALUE"
+      entry = @custom_file.batches.first.entries.first
+      entry.customer_name.should == "PETER PARKER"
+    end
+  end
+end

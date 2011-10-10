@@ -1,4 +1,16 @@
 module ACH
+  # Entry is {ACH::Record record} which locates inside of {ACH::Batch batch} component.
+  # == Fields:
+  # * record_type
+  # * transaction_code
+  # * routing_number
+  # * bank_account
+  # * amount
+  # * customer_acct
+  # * customer_name
+  # * transaction_type
+  # * addenda
+  # * bank_15
   class Entry < Record
     CREDIT_TRANSACTION_CODE_ENDING_DIGITS = ('0'..'4').to_a.freeze
     

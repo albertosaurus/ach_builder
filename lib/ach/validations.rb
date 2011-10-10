@@ -7,11 +7,11 @@ module ACH
     end
     
     def valid_component?
-      counts = {}
+      counts = Hash.new(0)
       to_ach.each do |record|
-        counts[record.class] ||= 0
         unless record.valid?
-          errors["#{record.class.name}##{counts[record.class] += 1}"] = record.errors
+          klass = record.class
+          errors["#{klass}##{counts[klass] += 1}"] = record.errors
         end
       end
     end

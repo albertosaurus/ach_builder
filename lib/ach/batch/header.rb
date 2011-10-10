@@ -1,4 +1,19 @@
 module ACH
+  # Every {ACH::Batch batch} component start with batch header record.
+  # == Fields:
+  # * record_type
+  # * service_class_code
+  # * company_name
+  # * company_note_data
+  # * company_id
+  # * entry_class_code
+  # * company_entry_descr
+  # * desc_date
+  # * effective_date
+  # * settlement_date
+  # * origin_status_code
+  # * origin_dfi_id
+  # * batch_number
   class Batch::Header < Record
     fields :record_type,
       :service_class_code,
@@ -7,7 +22,7 @@ module ACH
       :company_id,
       :entry_class_code,
       :company_entry_descr,
-      :date,
+      :desc_date,
       :effective_date,
       :settlement_date,
       :origin_status_code,

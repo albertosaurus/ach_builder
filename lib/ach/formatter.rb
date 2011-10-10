@@ -15,6 +15,9 @@ module ACH
   #    ACH::Formatter.format(:amount, 52)                       # => "0000000052"
   module Formatter
     extend self
+
+    mattr_accessor :compiled_rules
+    self.compiled_rules = {}
     
     RULES = {
       :customer_name            => '<-22',
@@ -86,11 +89,9 @@ module ACH
     
     RULE_PARSER_REGEX = /^(<-|->)(\d+)(-)?(\|\w+)?$/
     
-    @@compiled_rules = {}
-    
     def format field_name, value
-      compile_rule(field_name) unless @@compiled_rules.key?(field_name)
-      @@compiled_rules[field_name].call(value)
+      compile_rule(field_name) unless compiled_rules.key?(field_name)
+      compiled_rules[field_name].call(value)
     end
     
     def method_missing meth, *args
@@ -107,7 +108,7 @@ module ACH
       length = width.to_i
       padstr = padmethod == :ljust ? ' ' : pad == '-' ? ' ' : '0'
       transform = transf[1..-1] if transf
-      @@compiled_rules[field_name] = lambda{ |val|
+      compiled_rules[field_name] = lambda{ |val|
         val = val.to_s[0..length]
         (transform ? val.send(transform) : val).send(padmethod, length, padstr)
       }

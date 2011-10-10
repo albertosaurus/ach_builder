@@ -5,8 +5,8 @@ require "ach/version"
 Gem::Specification.new do |s|
   s.name        = "ach_builder"
   s.version     = ACH::VERSION
-  s.authors     = ["Artem Kuzko"]
-  s.email       = ["a.kuzko@gmail.com"]
+  s.authors     = ["Artem Kuzko", "Sergey Potapov"]
+  s.email       = ["AKuzko@sphereconsultinginc.com", "SPotapov@sphereconsultinginc.com"]
   s.homepage    = "http://github.com/akuzko/ach_builder"
   s.summary     = "Ruby tools for building ACH files"
   s.description = "Ruby tools for building ACH (Automated Clearing House) files"

@@ -41,4 +41,4 @@ file.write('ach_01.txt')
 
 ##Copyright
 
-Copyright (c) 2011 Artem Kuzko, released under the MIT license
+Copyright (c) 2011 TMX Credit, released under the MIT license

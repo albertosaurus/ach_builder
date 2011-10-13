@@ -3,7 +3,7 @@ module ACH
   # {ACH::Entry entries} and {ACH::Addenda addendas}.
   class Batch < Component
     has_many :entries
-    has_many :addendas
+    has_many :addendas, :linked_to => :entries
     
     def has_credit?
       entries.any?(&:credit?)
@@ -14,7 +14,7 @@ module ACH
     end
     
     def entry_addenda_count
-      entries.size + addendas.size
+      entries.size + addendas.values.flatten.size
     end
     
     def entry_hash
@@ -30,7 +30,7 @@ module ACH
     end
     
     def to_ach
-      [header] + entries + addendas + [control]
+      [header] + fetch_entries + [control]
     end
     
     def before_header
@@ -41,5 +41,10 @@ module ACH
       entries.select(&meth).map{ |entry| entry.amount.to_i }.compact.inject(&:+) || 0
     end
     private :amount_sum_for
+    
+    def fetch_entries
+      entries.inject([]){ |all, entry| all << entry << addendas[entry] }.flatten.compact
+    end
+    private :fetch_entries
   end
 end

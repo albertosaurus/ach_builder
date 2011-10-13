@@ -45,14 +45,6 @@ describe ACH::File do
     head.immediate_dest_name.should == 'BANK COMMERCE'
   end
 
-  it 'should be able to specify subcomponents with nested hash' do
-    header = {:header => {:immediate_dest => '321321321', :immediate_dest_name => 'BANK COMMERCE'}}
-    file = ACH::File.new(@attributes.merge(header))
-    head = file.header
-    head.immediate_dest.should == '321321321'
-    head.immediate_dest_name.should == 'BANK COMMERCE'
-  end
-  
   it "should raise exception on unknown attribute assignement" do
     lambda {
       ACH::File.new(@invalid_attributes)
@@ -96,9 +88,30 @@ describe ACH::File do
 
   describe 'transmission header' do
     before(:all) do
+      @with_transmission_header
       attrs = {:remote_id => 'ZYXWVUTS', :application_id => '98765432'}
       ach_file = ACH::FileFactory.with_transmission_header(attrs)
       @transmission_header = ach_file.to_s!.split("\r\n").first
+    end
+    
+    it "should raise error when defining empty transmission header" do
+      expect do
+        Class.new(ACH::File) do
+          transmission_header
+        end
+      end.to raise_error(ACH::File::EmptyTransmissionHeader)
+    end
+    
+    it "have_transmission_header? method should return proper value" do
+      without_header = Class.new(ACH::File)
+      with_header = Class.new(ACH::File) do
+        transmission_header do
+          application_id
+        end
+      end
+      
+      without_header.have_transmission_header?.should be_false
+      with_header.have_transmission_header?.should be_true
     end
 
     it "has length of 38" do
@@ -126,9 +139,7 @@ describe ACH::File do
     before(:all) do
       @custom_file_class = Class.new(ACH::File) do
         immediate_dest_name 'CUSTOM VALUE'
-        batch do
-          entry(:customer_name => "PETER PARKER")
-        end
+        customer_name "PETER PARKER"
       end
 
       @custom_file = @custom_file_class.new do

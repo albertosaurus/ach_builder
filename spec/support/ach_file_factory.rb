@@ -3,8 +3,25 @@ class ACH::FileFactory
   def self.sample_file(custom_attrs = {})
     attrs = {:company_id => '11-11111', :company_name => 'MY COMPANY'}
     attrs.merge!(custom_attrs)
-
-    ACH::File.new(attrs) do
+    with_transmission = attrs.delete(:transmission_header)
+    
+    klass = ACH::File
+    if with_transmission
+      klass = Class.new(klass) do
+        transmission_header do
+          request_type          '$$ADD ID='
+          remote_id             '132'
+          blank                 ' '
+          batch_id_parameter    'BID='
+          starting_single_quote "'"
+          file_type             'NWFACH'
+          application_id        '321'
+          ending_single_quote   "'"
+        end
+      end
+    end
+    
+    klass.new(attrs) do
       immediate_dest '123123123'
       immediate_dest_name 'COMMERCE BANK'
       immediate_origin '123123123'
@@ -31,8 +48,23 @@ class ACH::FileFactory
 
 
   def self.with_transmission_header(custom_attrs = {})
-    attrs = {:remote_id => 'ABCDEFGH', :application_id => '12345678'}.merge(custom_attrs)
-    sample_file(:transmission_header => attrs)
+    define_transmission_header_fields
+    attrs = {:transmission_header => true}.merge(custom_attrs)
+    sample_file(attrs)
   end
-
+  
+  def self.define_transmission_header_fields
+    unless ACH::Formatter.defined?(:request_type)
+      ACH::Formatter::RULES.merge!({
+        :request_type => '<-9-',
+        :remote_id => '<-8-',
+        :blank => '<-1-',
+        :batch_id_parameter => '<-4-',
+        :starting_single_quote => '<-1' ,
+        :file_type => '<-6-',
+        :application_id => '->8' ,
+        :ending_single_quote => '<-1' ,
+      })
+    end
+  end
 end

@@ -33,31 +33,42 @@ module ACH
   #   # write to file
   #   ach_file.write('custom_ach.txt')
   class File < Component
-    has_many :batches, lambda{ {:batch_number => batches.length + 1} }
-    subcomponent_list << :transmission_header
-
-    def self.method_missing(meth, attrs_or_value = {}, &block)
-      bs = ACH::File::BlankStruct.new
-      bs.instance_exec(&block) if block
-      attrs_or_value.deep_merge!(bs.to_hash) if attrs_or_value.is_a? Hash
-      default_opts[meth.to_sym] = attrs_or_value
+    class RedefinedTransmissionHeader < RuntimeError
+      def initialize
+        super "TransmissionHeader record may be defined only once"
+      end
     end
-
-    def self.default_opts
-      class << self; @default_opts ||= {}; end
+    
+    class EmptyTransmissionHeader < RuntimeError
+      def initialize
+        super "Transmission_header should declare it's fields"
+      end
     end
-
-    def initialize(fields = {}, &block)
-      super self.class.default_opts.deep_merge(fields), &block
+    
+    has_many :batches, :proc_defaults => lambda{ {:batch_number => batches.length + 1} }
+    
+    def self.transmission_header &block
+      raise RedefinedTransmissionHeader if have_transmission_header?
+      klass = Class.new(Record::Dynamic, &block)
+      raise EmptyTransmissionHeader.new if klass.fields.nil? || klass.fields.empty?
+      const_set(:TransmissionHeader, klass)
+      @have_transmission_header = true
     end
-
-    def transmission_header fields = {}, &block
-      attrs = @subcomponents[:transmission_header].merge(fields)
-      return nil if attrs.empty? && !block
-      merged_fields = fields_for(ACH::File::TransmissionHeader).merge(attrs)
-      @transmission_header ||= ACH::File::TransmissionHeader.new(merged_fields)
-      @transmission_header.tap do 
-        instance_eval(&block) if block
+    
+    def self.have_transmission_header?
+      @have_transmission_header
+    end
+    
+    def have_transmission_header?
+      self.class.have_transmission_header?
+    end
+    
+    def transmission_header(fields = {}, &block)
+      return nil unless have_transmission_header?
+      merged_fields = fields_for(self.class::TransmissionHeader).merge(fields)
+      @transmission_header ||= self.class::TransmissionHeader.new(merged_fields)
+      @transmission_header.tap do |head|
+        head.instance_eval(&block) if block
       end
     end
     
@@ -86,9 +97,11 @@ module ACH
     end
     
     def to_ach
-      extra = block_count * BLOCKING_FACTOR - file_entry_addenda_count - batch_count*2  - 2
+      extra = block_count * BLOCKING_FACTOR - file_entry_addenda_count - batch_count*2 - 2
+      head = [header]
+      head.unshift(transmission_header) if have_transmission_header?
       tail = ([Tail.new] * extra).unshift(control)
-      [transmission_header, header].compact + batches.map(&:to_ach).flatten + tail
+      head + batches.map(&:to_ach).flatten + tail
     end
     
     def to_s!

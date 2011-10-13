@@ -92,7 +92,6 @@ module ACH
     end
     private :defaults
     
-    
     def []= name, val
       fields[name] = val
     end

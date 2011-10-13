@@ -24,17 +24,18 @@ with similar functionality
         batch(:entry_class_code => code, :company_entry_descr => 'TV-TELCOM') do
           effective_date Time.now.strftime('%y%m%d')
           origin_dfi_id "00000000"
+          
           entry :customer_name => 'JOHN SMITH',
             :customer_acct     => '61242882282',
             :amount            => '2501',
             :routing_number    => '010010101',
             :bank_account      => '103030030'
-        end
-        addenda do
-          addenda_type_code          '05'
-          payment_related_info       'foo bar'
-          addenda_sequence_num       1
-          entry_details_sequence_num 1
+          addenda do
+            addenda_type_code          '05'
+            payment_related_info       'foo bar'
+            addenda_sequence_num       1
+            entry_details_sequence_num 1
+          end
         end
       end
     end

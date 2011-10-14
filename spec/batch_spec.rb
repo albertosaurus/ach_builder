@@ -6,17 +6,31 @@ describe ACH::Batch do
     @file = ACH::FileFactory.sample_file
   end
   
-  it "should create entry with attributes" do
+  it "should create entry with attributes in hash form" do
     entry = @batch.entry :amount => 100
     entry.should be_instance_of(ACH::Entry)
     entry.amount.should == 100
   end
   
-  it "should create entry with attributes" do
+  it "should create entry with attributes in block form" do
     entry = @batch.entry do
       amount 100
     end
     entry.amount.should == 100
+  end
+  
+  it "should raise error when adding addenda records without any entry" do
+    batch = ACH::Batch.new
+    expect{ batch.addenda(:payment_related_info =>'foo bar') }.to raise_error(ACH::Component::NoLinkError)
+  end
+  
+  it "should append addenda records after entry records" do
+    batch = ACH::Batch.new
+    3.times do |i|
+      batch.entry(:amount => 100)
+      i.times{ batch.addenda(:payment_related_info => 'foo bar') }
+    end
+    batch.to_ach.map(&:class)[1...-1].should == [ACH::Entry, ACH::Entry, ACH::Addenda, ACH::Entry, ACH::Addenda, ACH::Addenda]
   end
   
   it "should return false for has_credit? and has_debit? for empty entries" do

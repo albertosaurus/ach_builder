@@ -13,42 +13,56 @@ module ACH
     include Validations
     include Constants
     
-    # Exception which raises on attempt to assign a value to nonexistent field.
+    # Exception raised on attempt to assign a value to nonexistent field.
     class UnknownAttribute < ArgumentError
       def initialize field, obj
         super "Unrecognized attribute '#{field}' for #{obj}"
       end
     end
     
-    class_attribute :after_initialize_hooks, :subcomponent_list
+    # If Record should be attached to (preceded by) other Record, this
+    # exception is raised on attempt to create attachment record without
+    # having preceder record. For example, Addenda recourds should be
+    # created after Entry records. Each new Addenda record will be attached
+    # to the latest Entry record.
+    class NoLinkError < ArgumentError
+      def initialize link, klass
+        super "No #{link} was found to attach a new #{klass}"
+      end
+    end
+    
+    class_attribute :default_attributes
+    class_attribute :after_initialize_hooks
+    self.default_attributes = {}
     self.after_initialize_hooks = []
-    self.subcomponent_list      = [:header]
 
     attr_reader :attributes
 
     def self.inherited(klass)
+      klass.default_attributes = default_attributes.dup
       klass.after_initialize_hooks = after_initialize_hooks.dup
-      klass.subcomponent_list      = subcomponent_list.dup
+    end
+    
+    def self.method_missing meth, *args
+      if Formatter.defined?(meth)
+        default_attributes[meth] = args.first
+      else
+        super
+      end
     end
     
     def initialize fields = {}, &block
-      @attributes = {}
-      @subcomponents = Hash.new({})
+      @attributes = {}.merge(self.class.default_attributes)
       fields.each do |name, value|
-        if Formatter::RULES.key?(name)
-          @attributes[name] = value
-        elsif self.class.subcomponent_list.include?(name) and value.is_a?(Hash)
-          @subcomponents[name] = value
-        else
-          raise UnknownAttribute.new(name, self)
-        end
+        raise UnknownAttribute.new(name, self) unless Formatter.defined?(name)
+        @attributes[name] = value
       end
-      after_initialize if respond_to?(:after_initialize)
+      after_initialize
       instance_eval(&block) if block
     end
     
     def method_missing meth, *args
-      if Formatter::RULES.key?(meth)
+      if Formatter.defined?(meth)
         args.empty? ? @attributes[meth] : (@attributes[meth] = args.first)
       else
         super
@@ -74,7 +88,7 @@ module ACH
     #   header # => just returns a header object
     def header fields = {}, &block
       before_header
-      merged_fields = fields_for(self.class::Header).merge(@subcomponents[:header]).merge(fields)
+      merged_fields = fields_for(self.class::Header).merge(fields)
       @header ||= self.class::Header.new(merged_fields)
       @header.tap do |head|
         head.instance_eval(&block) if block
@@ -116,13 +130,14 @@ module ACH
     # The example above extends File with #batches and #batch instance methods:
     # * #batch is used to add new instance of Batch.
     # * #batches is used to get an array of batches which belong to file.
-    def self.has_many plural_name, proc_defaults = nil
+    def self.has_many plural_name, options = {}
       attr_reader plural_name
+      
+      proc_defaults = options[:proc_defaults]
+      linked_to = options[:linked_to]
       
       singular_name = plural_name.to_s.singularize
       klass = "ACH::#{singular_name.camelize}".constantize
-      subcomponent = singular_name.to_sym
-      self.subcomponent_list << subcomponent if klass < Component || klass < Record
       
       define_method(singular_name) do |*args, &block|
         index_or_fields = args.first || {}
@@ -130,13 +145,20 @@ module ACH
         
         defaults = proc_defaults ? instance_exec(&proc_defaults) : {}
 
-        klass.new(fields_for(singular_name).merge(defaults).merge(@subcomponents[subcomponent]).merge(index_or_fields)).tap do |component|
+        klass.new(fields_for(singular_name).merge(defaults).merge(index_or_fields)).tap do |component|
+          if linked_to
+            last_link = send(linked_to).last
+            raise NoLinkError.new(linked_to.to_s.singularize, klass.name) unless last_link
+            container = (send(plural_name)[last_link] ||= [])
+          else
+            container = send(plural_name)
+          end
           component.instance_eval(&block) if block
-          send(plural_name) << component
+          container << component
         end
       end
       
-      after_initialize_hooks << lambda { instance_variable_set("@#{plural_name}", []) }
+      after_initialize_hooks << lambda { instance_variable_set("@#{plural_name}", linked_to ? {} : []) }
     end
   end
 end

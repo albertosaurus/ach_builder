@@ -70,30 +70,23 @@ module ACH
       # Batch header
       :desc_date                => '<-6-', # company descriptive date
 
-      # Transmission Header
-      :request_type             => '<-9-',
-      :remote_id                => '<-8-',
-      :blank                    => '<-1-',
-      :batch_id_parameter       => '<-4-',
-      :starting_single_quote    => '<-1' ,
-      :file_type                => '<-6-',
-      :application_id           => '->8' ,
-      :ending_single_quote      => '<-1' ,
-
       # Addenda Record
-      :addenda_type_code          => '->2' ,
+      :addenda_type_code          => '->2',
       :payment_related_info       => '<-80',
-      :addenda_sequence_num       => '->4' ,
+      :addenda_sequence_num       => '->4',
       :entry_details_sequence_num => '->7'
-    }.freeze
+    }
     
+    def defined? field_name
+      RULES.key?(field_name)
+    end
+    
+    def define field, format
+      RULES[field] = format
+    end
     
     def method_missing meth, *args
-      if RULES.key? meth
-        format meth, *args
-      else
-        super
-      end
+      defined?(meth) ? format(meth, *args) : super
     end
 
     def format field_name, value

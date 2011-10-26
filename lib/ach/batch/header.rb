@@ -34,6 +34,6 @@ module ACH
       :company_note_data  => '',
       :date               => lambda{ Time.now.strftime("%y%m%d") },
       :settlement_date    => '',
-      :origin_status_code => ''
+      :origin_status_code => 1
   end
 end

@@ -32,7 +32,6 @@ module ACH
     
     defaults :record_type => 1,
       :priority_code      => 1,
-      :reference_code     => '',
       :date               => lambda{ Time.now.strftime("%y%m%d") },
       :time               => lambda{ Time.now.strftime("%H%M") },
       :file_id_modifier   => 'A',

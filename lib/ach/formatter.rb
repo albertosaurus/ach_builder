@@ -94,7 +94,7 @@ module ACH
     end
     
     def rule_for_field(field)
-      compiled_rules[field] ||= Rule.new(RULES[field]).to_proc
+      compiled_rules[field] ||= Rule.new(RULES[field])
     end
     private :rule_for_field
   end

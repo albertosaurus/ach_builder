@@ -82,6 +82,10 @@ module ACH
       end.join
     end
 
+    def from_str string
+
+    end
+
     # Returns a hash where key is field's name and value is field's value.
     def fields
       @fields ||= {}

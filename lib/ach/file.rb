@@ -54,6 +54,10 @@ module ACH
       const_set(:TransmissionHeader, klass)
       @have_transmission_header = true
     end
+
+    def self.read filename
+      Reader.parse filename
+    end
     
     def self.have_transmission_header?
       @have_transmission_header

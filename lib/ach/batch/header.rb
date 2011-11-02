@@ -14,7 +14,7 @@ module ACH
   # * origin_status_code
   # * origin_dfi_id
   # * batch_number
-  class Batch::Header < Record
+  class Batch::Header < Record::Base
     fields :record_type,
       :service_class_code,
       :company_name,

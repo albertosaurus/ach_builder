@@ -12,7 +12,7 @@ module ACH
   # * bank_6
   # * origin_dfi_id
   # * batch_number
-  class Batch::Control < Record
+  class Batch::Control < Record::Base
     fields :record_type,
       :service_class_code,
       :entry_addenda_count,

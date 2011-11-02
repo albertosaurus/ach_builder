@@ -103,7 +103,7 @@ module ACH
     end
     
     def fields_for component_or_class
-      klass = component_or_class.is_a?(Class) ? component_or_class : "ACH::#{component_or_class.camelize}".constantize
+      klass = component_or_class.is_a?(Class) ? component_or_class : ACH.to_const(component_or_class.camelize)
       if klass < Component
         attributes
       else
@@ -137,7 +137,8 @@ module ACH
       linked_to = options[:linked_to]
       
       singular_name = plural_name.to_s.singularize
-      klass = "ACH::#{singular_name.camelize}".constantize
+      camelized_singular_name = singular_name.camelize.to_sym
+      klass = ACH.to_const(camelized_singular_name)
       
       define_method(singular_name) do |*args, &block|
         index_or_fields = args.first || {}

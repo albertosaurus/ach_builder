@@ -15,7 +15,7 @@ module ACH
   # * immediate_dest_name
   # * immediate_origin_name
   # * reference_code
-  class File::Header < Record
+  class File::Header < Record::Base
     fields :record_type,
       :priority_code,
       :immediate_dest,

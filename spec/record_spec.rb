@@ -31,4 +31,23 @@ describe ACH::Record do
       @test_record.new.to_s!
     }.should raise_error(ACH::Record::EmptyField)
   end
+
+  context "creating record from string" do
+    before :each do
+      @content = "JOHN SMITH            0000000005"
+      @record  = @test_record.from_str @content
+    end
+
+    it "should be an instance of ACH::Record" do
+      @record.is_a?(ACH::Record).should be_true
+    end
+
+    it "should has correctly detected amount" do
+      @record.fields[:amount].should == '0000000005'
+    end
+
+    it "should has correctly detected customer_name" do
+      @record.fields[:customer_name].should == 'JOHN SMITH            '
+    end
+  end
 end

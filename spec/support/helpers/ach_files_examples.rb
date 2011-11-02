@@ -4,6 +4,10 @@ module AchFilesExamples
     File.expand_path(File.dirname(__FILE__) + '/../examples/well_fargo_empty.ach')
   end
 
+  def well_fargo_with_data
+    File.expand_path(File.dirname(__FILE__) + '/../examples/well_fargo_with_data.ach')
+  end
+
 end
 
 include AchFilesExamples

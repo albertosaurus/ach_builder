@@ -82,8 +82,15 @@ module ACH
       end.join
     end
 
-    def from_str string
-
+    def self.from_str string
+      source = string.clone
+      new.tap do |record|
+        fields.each do |field_name|
+          just, width, pad, transformation = Formatter::Rule.rule_params Formatter::RULES[field_name]
+          dirty_value = source.slice! 0..(width.to_i - 1)
+          record.send field_name, dirty_value
+        end
+      end
     end
 
     # Returns a hash where key is field's name and value is field's value.

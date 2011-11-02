@@ -4,7 +4,7 @@ module ACH
     RULE_PARSER_REGEX = /^(<-|->)(\d+)(-)?(\|\w+)?$/
 
     def self.new(rule)
-      just, width, pad, transf = rule.match(RULE_PARSER_REGEX)[1..-1]
+      just, width, pad, transf = rule_params rule
       length    = width.to_i
       padmethod = just == '<-' ? :ljust : :rjust
       padstr    = padmethod == :ljust ? ' ' : pad == '-' ? ' ' : '0'
@@ -13,6 +13,10 @@ module ACH
         val = val.to_s
         (transform ? val.send(transform) : val).send(padmethod, length, padstr)[-length..-1]
       end)
+    end
+
+    def self.rule_params rule
+      rule.match(RULE_PARSER_REGEX)[1..-1]
     end
   end
 end

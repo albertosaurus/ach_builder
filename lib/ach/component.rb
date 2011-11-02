@@ -37,6 +37,7 @@ module ACH
     self.after_initialize_hooks = []
 
     attr_reader :attributes
+    attr_writer :control
 
     def self.inherited(klass)
       klass.default_attributes = default_attributes.dup
@@ -95,11 +96,14 @@ module ACH
       end
     end
     
-    # Returns a control record object
     def control
-      klass = self.class::Control
+      @control || create_control!
+    end
+
+    def create_control!
+      klass  = self.class::Control
       fields = klass.fields.select{ |f| respond_to?(f) || attributes[f] }
-      klass.new Hash[*fields.zip(fields.map{ |f| send(f) }).flatten]
+      self.control = klass.new Hash[*fields.zip(fields.map{ |f| send(f) }).flatten]
     end
     
     def fields_for component_or_class

@@ -46,7 +46,7 @@ module ACH
     end
     
     has_many :batches, :proc_defaults => lambda{ {:batch_number => batches.length + 1} }
-    
+
     def self.transmission_header &block
       raise RedefinedTransmissionHeader if have_transmission_header?
       klass = Class.new(Record::Dynamic, &block)
@@ -56,7 +56,7 @@ module ACH
     end
 
     def self.read filename
-      Reader.parse filename
+      Reader.from_file filename
     end
     
     def self.have_transmission_header?
@@ -101,11 +101,9 @@ module ACH
     end
     
     def to_ach
-      extra = block_count * BLOCKING_FACTOR - file_entry_addenda_count - batch_count*2 - 2
-      head = [header]
+      head = [ header ]
       head.unshift(transmission_header) if have_transmission_header?
-      tail = ([Tail.new] * extra).unshift(control)
-      head + batches.map(&:to_ach).flatten + tail
+      head + batches.map(&:to_ach).flatten + [control] + tail
     end
     
     def to_s!
@@ -113,7 +111,7 @@ module ACH
     end
     
     def record_count
-      2 + batches.length * 2 + file_entry_addenda_count
+      2 + batch_count * 2 + file_entry_addenda_count
     end
     
     def write filename
@@ -127,5 +125,14 @@ module ACH
       batches.map(&meth).compact.inject(&:+)
     end
     private :batch_sum_of
+
+    def tail
+      [ Tail.new ] * tails_count
+    end
+
+    def tails_count
+      block_count * BLOCKING_FACTOR - file_entry_addenda_count - batch_count*2 - 2
+    end
+
   end
 end

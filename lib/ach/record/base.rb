@@ -66,8 +66,13 @@ module ACH
         end
       end
       private_class_method :define_field_methods
+
+      def self.from_s(string)
+        field_regexp = /^#{fields.map{ |f| Formatter.rule_for_field(f).matcher }.join}$/
+        new Hash[*fields.zip(string.match(field_regexp)[1..-1]).flatten]
+      end
       
-      def initialize fields = {}, &block
+      def initialize(fields = {}, &block)
         defaults.each do |key, value|
           self.fields[key] = Proc === value ? value.call : value
         end

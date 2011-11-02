@@ -11,7 +11,7 @@ module ACH
   #    end
   class Component
     extend ActiveSupport::Autoload
-    
+
     include Validations
     include Constants
     
@@ -53,13 +53,17 @@ module ACH
       end
     end
     
-    def initialize fields = {}, &block
+    def initialize(fields = {}, &block)
+      if fields == false
+        fields = {}
+      else
+        extend self.class::Builder
+      end
       @attributes = {}.merge(self.class.default_attributes)
       fields.each do |name, value|
         raise UnknownAttribute.new(name, self) unless Formatter.defined?(name)
         @attributes[name] = value
       end
-      extend self.class::Builder
       after_initialize
       instance_eval(&block) if block
     end
@@ -89,20 +93,28 @@ module ACH
     #
     # = Example 3:
     #   header # => just returns a header object
-    def header fields = {}, &block
-      before_header
-      merged_fields = fields_for(self.class::Header).merge(fields)
-      @header ||= self.class::Header.new(merged_fields)
-      @header.tap do |head|
-        head.instance_eval(&block) if block
+    def header fields_or_string = {}, &block
+      if kind_of?(self.class::Parser)
+        @header ||= self.class::Header.from_s(fields_or_string)
+      else
+        before_header
+        merged_fields = fields_for(self.class::Header).merge(fields_or_string)
+        @header ||= self.class::Header.new(merged_fields)
+        @header.tap do |head|
+          head.instance_eval(&block) if block
+        end
       end
     end
     
     # Returns a control record object
-    def control
-      klass = self.class::Control
-      fields = klass.fields.select{ |f| respond_to?(f) || attributes[f] }
-      klass.new Hash[*fields.zip(fields.map{ |f| send(f) }).flatten]
+    def control string = nil
+      if kind_of?(self.class::Parser)
+        @control ||= self.class::Control.from_s(string)
+      else
+        klass = self.class::Control
+        fields = klass.fields.select{ |f| respond_to?(f) || attributes[f] }
+        klass.new Hash[*fields.zip(fields.map{ |f| send(f) }).flatten]
+      end
     end
     
     def fields_for component_or_class
@@ -148,6 +160,9 @@ module ACH
         return send(plural_name)[index_or_fields] if Fixnum === index_or_fields
         
         defaults = proc_defaults ? instance_exec(&proc_defaults) : {}
+        if kind_of?(self.class::Parser) && klass < ACH::Record::Base
+          index_or_fields = klass.from_s(index_or_fields).fields
+        end
 
         klass.new(fields_for(singular_name).merge(defaults).merge(index_or_fields)).tap do |component|
           if linked_to

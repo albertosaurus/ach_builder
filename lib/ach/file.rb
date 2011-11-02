@@ -36,10 +36,17 @@ module ACH
     autoload :Builder
     autoload :Control
     autoload :Header
+    autoload :Parser
     autoload :TransmissionHeader
 
     include TransmissionHeader
 
     has_many :batches, :proc_defaults => lambda{ {:batch_number => batches.length + 1} }
+
+    def self.read filename
+      ::File.open(filename) do |fh|
+        new(false).extend(Parser).parse(fh.each)
+      end
+    end
   end
 end

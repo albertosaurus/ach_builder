@@ -19,5 +19,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_development_dependency "rspec", ">= 2.0.0"
+  s.add_development_dependency "cucumber"
   s.add_runtime_dependency "activesupport", ">= 2.3.0"
 end

@@ -10,4 +10,8 @@ module AchFilesExamples
 
 end
 
-include AchFilesExamples
+if defined?(World)
+  World(AchFilesExamples)
+else
+  include AchFilesExamples
+end

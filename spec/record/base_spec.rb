@@ -39,7 +39,7 @@ describe ACH::Record::Base do
     end
 
     it "should be an instance of ACH::Record" do
-      @record.is_a?(ACH::Record).should be_true
+      @record.is_a?(ACH::Record::Base).should be_true
     end
 
     it "should has correctly detected amount" do

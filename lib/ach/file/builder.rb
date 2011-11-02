@@ -1,13 +1,12 @@
 module ACH
   module File::Builder
-    include ACH::Constants
-    
+
     def batch_count
       batches.length
     end
     
     def block_count
-      ((file_entry_addenda_count + batch_count*2 + 2).to_f / BLOCKING_FACTOR).ceil
+      ((file_entry_addenda_count + batch_count*2 + 2).to_f / Constants::BLOCKING_FACTOR).ceil
     end
     
     def file_entry_addenda_count
@@ -27,7 +26,7 @@ module ACH
     end
     
     def to_s!
-      to_ach.map(&:to_s!).join("\r\n") + "\r\n"
+      to_ach.map(&:to_s!).join(Constants::ROWS_DELIMITER)
     end
     
     def record_count
@@ -53,11 +52,12 @@ module ACH
     end
 
     def tail
-      [ Tail.new ] * tails_count
+      [ Record::Tail.new ] * tails_count
     end
 
     def tails_count
-      block_count * BLOCKING_FACTOR - file_entry_addenda_count - batch_count*2 - 2
+      block_count * Constants::BLOCKING_FACTOR - file_entry_addenda_count - batch_count*2 - 2
     end
+
   end
 end

@@ -30,7 +30,7 @@ module ACH
       :immediate_origin_name,
       :reference_code
     
-    defaults :record_type => 1,
+    defaults :record_type => FILE_HEADER_RECORD_TYPE,
       :priority_code      => 1,
       :date               => lambda{ Time.now.strftime("%y%m%d") },
       :time               => lambda{ Time.now.strftime("%H%M") },

@@ -29,7 +29,7 @@ module ACH
       :origin_dfi_id,
       :batch_number
     
-    defaults :record_type => 5,
+    defaults :record_type => BATCH_HEADER_RECORD_TYPE,
       :service_class_code => 200,
       :company_note_data  => '',
       :date               => lambda{ Time.now.strftime("%y%m%d") },

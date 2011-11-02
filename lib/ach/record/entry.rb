@@ -26,7 +26,7 @@ module ACH
         :addenda,
         :bank_15
       
-      defaults :record_type => 6,
+      defaults :record_type => BATCH_ADDENDA_RECORD_TYPE,
         :transaction_code   => 27,
         :transaction_type   => 'S',
         :customer_acct      => '',

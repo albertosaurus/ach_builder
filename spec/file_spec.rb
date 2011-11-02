@@ -84,7 +84,7 @@ describe ACH::File do
     end
 
     it "should have length devisible by 94 (record size)" do
-      (@sample_file.to_s!.gsub("\r\n", '').length % ACH::Constants::RECORD_SIZE).should be_zero
+      (@sample_file.to_s!.gsub(ACH::Constants::ROWS_DELIMITER, '').length % ACH::Constants::RECORD_SIZE).should be_zero
     end
 
 
@@ -93,7 +93,7 @@ describe ACH::File do
         @with_transmission_header
         attrs = {:remote_id => 'ZYXWVUTS', :application_id => '98765432'}
         ach_file = ACH::FileFactory.with_transmission_header(attrs)
-        @transmission_header = ach_file.to_s!.split("\r\n").first
+        @transmission_header = ach_file.to_s!.split(ACH::Constants::ROWS_DELIMITER).first
       end
 
       it "should raise error when defining empty transmission header" do
@@ -130,10 +130,10 @@ describe ACH::File do
     end
 
     it 'number of records is multiple of 10 (transmission header is ignored)' do
-      records = ACH::FileFactory.sample_file.to_s!.split("\r\n")
+      records = ACH::FileFactory.sample_file.to_s!.split(ACH::Constants::ROWS_DELIMITER)
       (records.size % 10).should == 0
 
-      records = ACH::FileFactory.with_transmission_header.to_s!.split("\r\n")
+      records = ACH::FileFactory.with_transmission_header.to_s!.split(ACH::Constants::ROWS_DELIMITER)
       ((records.size - 1) % 10).should == 0
     end
 
@@ -178,9 +178,5 @@ describe ACH::File do
     before(:each) { @result = ACH::File.read well_fargo_empty_filename }
     subject { @result }
     it { should be_an ACH::File }
-
-    it "ss" do
-      p @result.batches
-    end
   end
 end

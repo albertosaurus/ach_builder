@@ -19,7 +19,7 @@ module ACH
       :total_credit_amount,
       :bank_39
     
-    defaults :record_type => 9,
+    defaults :record_type => FILE_CONTROL_RECORD_TYPE,
       :bank_39            => ''
   end
 end

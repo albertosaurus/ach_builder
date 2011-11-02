@@ -14,7 +14,7 @@ module ACH
         :addenda_sequence_num,
         :entry_details_sequence_num
 
-      defaults :record_type => 7,
+      defaults :record_type => BATCH_ADDENDA_RECORD_TYPE,
         :addenda_type_code => 5
     end
   end

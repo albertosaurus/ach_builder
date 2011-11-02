@@ -41,5 +41,9 @@ module ACH
     include TransmissionHeader
 
     has_many :batches, :proc_defaults => lambda{ {:batch_number => batches.length + 1} }
+
+    def self.read filename
+      Reader.from_file filename
+    end
   end
 end

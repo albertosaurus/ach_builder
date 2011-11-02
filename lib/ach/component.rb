@@ -102,6 +102,10 @@ module ACH
         head.instance_eval(&block) if block
       end
     end
+
+    def header= header
+      @header = header
+    end
     
     def control
       @control || create_control!

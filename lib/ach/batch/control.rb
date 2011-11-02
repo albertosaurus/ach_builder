@@ -25,7 +25,7 @@ module ACH
       :origin_dfi_id,
       :batch_number
     
-    defaults :record_type => 8,
+    defaults :record_type => BATCH_CONTROL_RECORD_TYPE,
       :authen_code        => '',
       :bank_6             => ''
   end

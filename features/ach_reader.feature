@@ -1,6 +1,11 @@
-Feature: Ach reader could read ach files and make it ruby object copy
+Feature: ACH reader could parse ach-formatted files and make ruby copy of it
 
-  Scenario:
-    Given an empty wells fargo ach file
+  Scenario Outline:
+    Given <kind> ach file
     When I read this file with ach reader
     Then it should be converted to ach file instance
+
+  Examples:
+    | kind                     |
+    | an empty wells fargo     |
+    | an wells fargo with data |

@@ -14,12 +14,12 @@ module ACH
     end
 
     def self.parse string
-      @parser = Parser.new string
-      @parser.run
+      Parser.process_string string
     end
 
     def self.to_ach_file string
       header, batches, control = parse(string)
+
       ACH::File.new.tap do |file|
         apply_header! header, file
         batches.each { |batch| apply_batch! batch, file }

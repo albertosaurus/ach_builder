@@ -7,6 +7,10 @@ module ACH
       self.source = string
     end
 
+    def self.process_string string
+      new(string).run
+    end
+
     def run
       [ header, batch, control ]
     end
@@ -35,8 +39,8 @@ module ACH
       detect_data_rows.map do |data_entry|
         ACH::Batch.new.tap do |batch|
           batch.header  ACH::Batch::Header.from_str(data_entry[:header]).fields
-          batch.entry   ACH::Entry.from_str(data_entry[:entry]).fields
-          batch.addenda ACH::Addenda.from_str(data_entry[:addenda]).fields
+          batch.entry   ACH::Record::Entry.from_str(data_entry[:entry]).fields
+          batch.addenda ACH::Record::Addenda.from_str(data_entry[:addenda]).fields
           batch.control = ACH::Batch::Control.from_str data_entry[:control]
         end
       end
@@ -104,7 +108,7 @@ module ACH
       end
 
       def file_batch_addenda? type
-        type == ACH::Addenda.new.record_type
+        type == ACH::Record::Addenda.new.record_type
       end
 
       def file_batch_entry? type
@@ -120,7 +124,7 @@ module ACH
       end
 
       def batch_entry_record_type
-        @batch_entry_record_type ||= ACH::Entry.new.record_type
+        @batch_entry_record_type ||= ACH::Record::Entry.new.record_type
       end
 
   end

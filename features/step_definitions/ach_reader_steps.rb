@@ -9,3 +9,7 @@ end
 Then /^it should be converted to ach file instance$/ do
   @result.should be_instance_of ACH::File
 end
+
+Given /^an wells fargo with data ach file$/ do
+  @file = well_fargo_with_data
+end

@@ -67,9 +67,16 @@ module ACH
       end
       private_class_method :define_field_methods
 
-      def self.from_s(string)
-        field_regexp = /^#{fields.map{ |f| Formatter.rule_for_field(f).matcher }.join}$/
-        new Hash[*fields.zip(string.match(field_regexp)[1..-1]).flatten]
+      def self.from_str string
+        source = string.clone
+
+        new.tap do |record|
+          fields.each do |field_name|
+            just, width, pad, transformation = Formatter::Rule.rule_params Formatter::RULES[field_name]
+            dirty_value = source.slice! 0..(width.to_i - 1)
+            record.send field_name, dirty_value
+          end
+        end
       end
       
       def initialize(fields = {}, &block)

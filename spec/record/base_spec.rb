@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe ACH::Record do
+describe ACH::Record::Base do
   before(:all) do
-    @test_record = Class.new(ACH::Record) do
+    @test_record = Class.new(ACH::Record::Base) do
       fields :customer_name, :amount
       defaults :customer_name => 'JOHN SMITH'
     end
@@ -29,7 +29,7 @@ describe ACH::Record do
   it "should raise exception with unfilled value" do
     lambda{
       @test_record.new.to_s!
-    }.should raise_error(ACH::Record::EmptyField)
+    }.should raise_error(ACH::Record::Base::EmptyField)
   end
 
   context "creating record from string" do

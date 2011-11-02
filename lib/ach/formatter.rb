@@ -86,7 +86,7 @@ module ACH
     end
     
     def method_missing meth, *args
-      defined?(meth) ? format(meth, *args) : super
+      self.defined?(meth) ? format(meth, *args) : super
     end
 
     def format field_name, value
@@ -96,6 +96,5 @@ module ACH
     def rule_for_field(field)
       compiled_rules[field] ||= Rule.new(RULES[field])
     end
-    private :rule_for_field
   end
 end

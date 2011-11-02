@@ -57,6 +57,7 @@ module ACH
         raise UnknownAttribute.new(name, self) unless Formatter.defined?(name)
         @attributes[name] = value
       end
+      extend self.class::Builder
       after_initialize
       instance_eval(&block) if block
     end

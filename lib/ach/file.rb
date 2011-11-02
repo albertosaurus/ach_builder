@@ -34,18 +34,5 @@ module ACH
   #   ach_file.write('custom_ach.txt')
   class File < Component
     has_many :batches, :proc_defaults => lambda{ {:batch_number => batches.length + 1} }
-
-    def initialize mixed = {}, &block
-      unless mixed == :parser
-        extend Builder
-        super
-      else
-        extend Parser
-      end
-    end
-
-    def self.read filename
-      new(:parser).parse ::File.readlines(filename)
-    end
   end
 end

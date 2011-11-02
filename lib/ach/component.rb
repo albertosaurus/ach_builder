@@ -10,6 +10,8 @@ module ACH
   #      # implementation
   #    end
   class Component
+    extend ActiveSupport::Autoload
+    
     include Validations
     include Constants
     

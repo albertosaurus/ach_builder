@@ -41,8 +41,4 @@ module ACH
       end
     end
   end
-
-  class File
-    include TransmissionHeader
-  end
 end

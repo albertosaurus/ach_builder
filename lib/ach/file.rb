@@ -33,6 +33,13 @@ module ACH
   #   # write to file
   #   ach_file.write('custom_ach.txt')
   class File < Component
+    autoload :Builder
+    autoload :Control
+    autoload :Header
+    autoload :TransmissionHeader
+
+    include TransmissionHeader
+
     has_many :batches, :proc_defaults => lambda{ {:batch_number => batches.length + 1} }
   end
 end

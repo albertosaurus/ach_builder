@@ -3,4 +3,6 @@
 Gemfile.lock
 pkg/*
 /.yardoc
-tmp/
+tmp/*
+# track metric_fu output
+!tmp/metric_fu/

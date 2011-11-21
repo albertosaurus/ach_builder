@@ -2,44 +2,86 @@ require 'spec_helper'
 
 describe ACH::File::Reader do
 
-  context "empty ACH file" do
-    context "reading from string" do
-      before :each do
-        @content = File.read(well_fargo_empty_filename)
-      end
+  context "reading from string" do
+    { 'empty' => well_fargo_empty_filename, 'non-empty' => well_fargo_with_data }.each do |description, file|
+      context description do
+        before do
+          @source   = File.read(file)
+          @ach_file = ACH::File::Reader.from_string(@source)
+        end
 
-      subject { ACH::File::Reader.from_string(@content) }
+        subject { @ach_file }
 
-      it "should return instance of the ACH::File" do
-        should be_instance_of ACH::File
-      end
-    end
+        it "should return instance of the ACH::File" do
+          should be_instance_of ACH::File
+        end
 
-    context "reading from file" do
-      before :each do
-        @filename = well_fargo_empty_filename
-        @result   = ACH::File::Reader.from_file(@filename)
-      end
+        describe "reverse conversion" do
+          before do
+            @result = @ach_file.to_s!
+            @result.gsub! /^9+\n?$/, ''
+            @result.gsub! /^\n$/,    ''
+          end
 
-      subject { @result }
-
-      it "should return instance of the ACH::File" do
-        should be_instance_of ACH::File
+          subject { @result }
+          it { should be_a String }
+          it "should be eql to source string" do
+            should == @source
+          end
+        end
       end
     end
   end
 
-  context "ACH file with data" do
-    before :each do
-      @content = File.read(well_fargo_with_data)
-      @result  = ACH::File::Reader.from_string(@content)
+  context "reading from file" do
+    { 'empty' => well_fargo_empty_filename, 'non-empty' => well_fargo_with_data }.each do |description, file|
+      context description do
+        before do
+          @source   = file
+          @ach_file = ACH::File::Reader.from_file(@source)
+        end
+
+        subject { @ach_file }
+
+        it "should return instance of the ACH::File" do
+          should be_instance_of ACH::File
+        end
+
+        describe "reverse conversion" do
+          before do
+            @result = @ach_file.to_s!
+            @result.gsub! /^9+\n?$/, ''
+            @result.gsub! /^\n$/,    ''
+          end
+
+          subject { @result }
+          it { should be_a String }
+          it "should be eql to source string" do
+            should == File.read(@source)
+          end
+        end
+      end
+    end
+  end
+
+  context "reading ACH file without batches" do
+    before do
+      @source   = well_fargo_empty_filename
+      @ach_file = ACH::File::Reader.from_file(@source)
     end
 
-    subject { @result }
+    it { @ach_file.header.should be_an ACH::File::Header }
+    it { @ach_file.batches.count.should == 0 }
+  end
 
-    it "should return instance of the ACH::File" do
-      should be_instance_of ACH::File
+  context "reading ACH file with batch" do
+    before do
+      @source   = well_fargo_with_data
+      @ach_file = ACH::File::Reader.from_file(@source)
     end
+
+    it { @ach_file.header.should be_an ACH::File::Header }
+    it { @ach_file.batches.count.should == 1 }
   end
 
 end

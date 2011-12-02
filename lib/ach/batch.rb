@@ -3,9 +3,10 @@ module ACH
   # {ACH::Entry entries} and {ACH::Addenda addendas}.
   class Batch < Component
     autoload :Builder
-    autoload :Parser
     autoload :Control
     autoload :Header
+
+    include Builder
 
     has_many :entries
     has_many :addendas, :linked_to => :entries

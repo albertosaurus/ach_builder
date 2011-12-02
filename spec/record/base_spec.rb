@@ -29,7 +29,7 @@ describe ACH::Record::Base do
   it "should raise exception with unfilled value" do
     lambda{
       @test_record.new.to_s!
-    }.should raise_error(ACH::Record::Base::EmptyField)
+    }.should raise_error(ACH::Record::Base::EmptyFieldError)
   end
 
   context "creating record from string" do

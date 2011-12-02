@@ -2,23 +2,23 @@ module ACH
   module File::TransmissionHeader
     extend ActiveSupport::Concern
 
-    class RedefinedTransmissionHeader < RuntimeError
+    class RedefinedTransmissionHeaderError < RuntimeError
       def initialize
         super "TransmissionHeader record may be defined only once"
       end
     end
     
-    class EmptyTransmissionHeader < RuntimeError
+    class EmptyTransmissionHeaderError < RuntimeError
       def initialize
         super "Transmission_header should declare it's fields"
       end
     end
 
     module ClassMethods
-      def transmission_header &block
-        raise RedefinedTransmissionHeader if have_transmission_header?
+      def transmission_header(&block)
+        raise RedefinedTransmissionHeaderError if have_transmission_header?
         klass = Class.new(Record::Dynamic, &block)
-        raise EmptyTransmissionHeader.new if klass.fields.nil? || klass.fields.empty?
+        raise EmptyTransmissionHeaderError if klass.fields.nil? || klass.fields.empty?
         const_set(:TransmissionHeader, klass)
         @have_transmission_header = true
       end

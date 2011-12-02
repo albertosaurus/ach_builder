@@ -1,12 +1,11 @@
 module ACH
   module File::Builder
-
     def batch_count
       batches.length
     end
     
     def block_count
-      ((file_entry_addenda_count + batch_count*2 + 2).to_f / Constants::BLOCKING_FACTOR).ceil
+      ((file_entry_addenda_count + batch_count * 2 + 2).to_f / Constants::BLOCKING_FACTOR).ceil
     end
     
     def file_entry_addenda_count
@@ -33,7 +32,7 @@ module ACH
       2 + batches.length * 2 + file_entry_addenda_count
     end
     
-    def write filename
+    def write(filename)
       return false unless valid?
       ::File.open(filename, 'w') do |fh|
         fh.write(to_s!)
@@ -58,6 +57,5 @@ module ACH
     def tails_count
       block_count * Constants::BLOCKING_FACTOR - file_entry_addenda_count - batch_count*2 - 2
     end
-
   end
 end

@@ -16,7 +16,7 @@ module ACH
     include Constants
     
     # Exception raised on attempt to assign a value to nonexistent field.
-    class UnknownAttribute < ArgumentError
+    class UnknownAttributeError < ArgumentError
       def initialize field, obj
         super "Unrecognized attribute '#{field}' for #{obj}"
       end
@@ -55,21 +55,16 @@ module ACH
     end
     
     def initialize(fields = {}, &block)
-      if fields == false
-        fields = {}
-      else
-        extend self.class::Builder
-      end
       @attributes = {}.merge(self.class.default_attributes)
       fields.each do |name, value|
-        raise UnknownAttribute.new(name, self) unless Formatter.defined?(name)
+        raise UnknownAttributeError.new(name, self) unless Formatter.defined?(name)
         @attributes[name] = value
       end
       after_initialize
       instance_eval(&block) if block
     end
     
-    def method_missing meth, *args
+    def method_missing(meth, *args)
       if Formatter.defined?(meth)
         args.empty? ? @attributes[meth] : (@attributes[meth] = args.first)
       else
@@ -94,7 +89,7 @@ module ACH
     #
     # = Example 3:
     #   header # => just returns a header object
-    def header fields = {}, &block
+    def header(fields = {}, &block)
       before_header
       merged_fields = fields_for(self.class::Header).merge(fields)
       @header ||= self.class::Header.new(merged_fields)
@@ -103,7 +98,7 @@ module ACH
       end
     end
 
-    def header= header
+    def header=(header)
       @header = header
     end
     
@@ -117,7 +112,7 @@ module ACH
       self.control = klass.new Hash[*fields.zip(fields.map{ |f| send(f) }).flatten]
     end
     
-    def fields_for component_or_class
+    def fields_for(component_or_class)
       klass = component_or_class.is_a?(Class) ? component_or_class : ACH.to_const(component_or_class.camelize)
       if klass < Component
         attributes
@@ -145,7 +140,7 @@ module ACH
     # The example above extends File with #batches and #batch instance methods:
     # * #batch is used to add new instance of Batch.
     # * #batches is used to get an array of batches which belong to file.
-    def self.has_many plural_name, options = {}
+    def self.has_many(plural_name, options = {})
       attr_reader plural_name
       
       proc_defaults = options[:proc_defaults]

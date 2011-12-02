@@ -14,8 +14,6 @@ module ACH
   #    ACH::Formatter.format(:customer_name, "LINUS TORVALDS")  # => "LINUS TORVALDS        "
   #    ACH::Formatter.format(:amount, 52)                       # => "0000000052"
   module Formatter
-    extend self
-
     mattr_accessor :compiled_rules
     self.compiled_rules = {}
     
@@ -77,24 +75,28 @@ module ACH
       :entry_details_sequence_num => '->7'
     }
     
-    def defined? field_name
+    def self.defined?(field_name)
       RULES.key?(field_name)
     end
     
-    def define field, format
+    def self.define(field, format)
       RULES[field] = format
     end
     
-    def method_missing meth, *args
+    def self.method_missing(meth, *args)
       self.defined?(meth) ? format(meth, *args) : super
     end
 
-    def format field_name, value
+    def self.format(field_name, value)
       rule_for_field(field_name).call(value)
     end
     
-    def rule_for_field(field)
+    def self.rule_for_field(field)
       compiled_rules[field] ||= Rule.new(RULES[field])
+    end
+
+    def self.matcher_for(fields)
+      /^#{fields.map{ |f| "(.{#{rule_for_field(f).length}})" }.join}$/
     end
   end
 end

@@ -1,21 +1,20 @@
 module ACH
   module File::Reader
-
-    def self.from_string string
+    def self.from_string(string)
       to_ach string
     end
 
-    def self.from_file filename
+    def self.from_file(filename)
       read_file(filename) do |string|
         from_string string
       end
     end
 
-    def self.parse string
+    def self.parse(string)
       Parser.run(string)
     end
 
-    def self.to_ach string
+    def self.to_ach(string)
       header_row, batches_rows, control_row = parse(string)
 
       File.new.tap do |file|
@@ -25,7 +24,9 @@ module ACH
           file.batches << Batch.new.tap do |batch|
             batch.header = Batch::Header.from_str(batch_params[:header])
             batch.entries << Record::Entry.from_str(batch_params[:entry])
-            batch.addenda Record::Addenda.from_str(batch_params[:addenda]).fields
+            batch_params[:addendas].each do |str|
+              batch.addenda Record::Addenda.from_str(str).fields
+            end
             batch.control = Batch::Control.from_str(batch_params[:control])
           end
         end
@@ -34,12 +35,10 @@ module ACH
       end
     end
 
-    def self.read_file filename, &block
-      file = ::File.open filename, 'r'
-      block.call(file.read)
-    ensure
-      file.close
+    def self.read_file(filename)
+      ::File.open(filename) do |fh|
+        yield fh.read
+      end
     end
-
   end
 end

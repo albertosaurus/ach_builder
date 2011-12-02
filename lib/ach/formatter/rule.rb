@@ -5,6 +5,8 @@ module ACH
 
     delegate :call, :[], :to => :@lambda
 
+    attr_reader :length
+
     def initialize(rule)
       just, width, pad, transf = self.class.rule_params rule
       @length    = width.to_i
@@ -18,12 +20,8 @@ module ACH
       end
     end
 
-    def self.rule_params rule
+    def self.rule_params(rule)
       rule.match(RULE_PARSER_REGEX)[1..-1]
-    end
-    
-    def matcher
-      "(.{#{@length}})"
     end
   end
 end

@@ -50,7 +50,7 @@ describe ACH::File do
     it "should raise exception on unknown attribute assignement" do
       lambda {
         ACH::File.new(@invalid_attributes)
-      }.should raise_error(ACH::Component::UnknownAttribute)
+      }.should raise_error(ACH::Component::UnknownAttributeError)
     end
 
     it "should be able to create a batch" do
@@ -101,7 +101,7 @@ describe ACH::File do
           Class.new(ACH::File) do
             transmission_header
           end
-        end.to raise_error(ACH::File::EmptyTransmissionHeader)
+        end.to raise_error(ACH::File::EmptyTransmissionHeaderError)
       end
 
       it "have_transmission_header? method should return proper value" do

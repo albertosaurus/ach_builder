@@ -23,16 +23,16 @@ module ACH
       include Constants
       
       # Raises when unknown field passed to {ACH::Record.fields Record.fields} method
-      class UnknownField < ArgumentError
-        def initialize field, class_name
+      class UnknownFieldError < ArgumentError
+        def initialize(field, class_name)
           super "Unrecognized field '#{field}' in class #{class_name}"
         end
       end
       
       # Raises when value of record's field is not specified and there is no
       # default value.
-      class EmptyField < ArgumentError
-        def initialize field, record
+      class EmptyFieldError < ArgumentError
+        def initialize(field, record)
           super "Empty field '#{field}' for #{record}"
         end
       end
@@ -41,7 +41,7 @@ module ACH
       # must be declared in {ACH::Formatter Formatter}.
       # == Example:
       #    fields :foo, :bar
-      def self.fields *field_names
+      def self.fields(*field_names)
         return @fields if field_names.empty?
         @fields = field_names
         @fields.each{ |field| define_field_methods(field) }
@@ -51,13 +51,13 @@ module ACH
       # == Example:
       #    defaults :foo => "foo value",
       #             :bar => "bar value"
-      def self.defaults default_values = nil
+      def self.defaults(default_values = nil)
         return @defaults if default_values.nil?
         @defaults = default_values.freeze
       end
 
       def self.define_field_methods(field)
-        raise UnknownField.new(field, name) unless Formatter::RULES.key?(field)
+        raise UnknownFieldError.new(field, name) unless Formatter::RULES.key?(field)
         define_method(field) do |*args|
           args.empty? ? @fields[field] : (@fields[field] = args.first)
         end
@@ -67,16 +67,9 @@ module ACH
       end
       private_class_method :define_field_methods
 
-      def self.from_str string
-        source = string.clone
-
-        new.tap do |record|
-          fields.each do |field_name|
-            just, width, pad, transformation = Formatter::Rule.rule_params Formatter::RULES[field_name]
-            dirty_value = source.slice! 0..(width.to_i - 1)
-            record.send field_name, dirty_value
-          end
-        end
+      def self.from_str(string)
+        field_matcher_regexp = Formatter.matcher_for(fields)
+        new Hash[*fields.zip(string.match(field_matcher_regexp)[1..-1]).flatten]
       end
       
       def initialize(fields = {}, &block)
@@ -90,7 +83,7 @@ module ACH
       # Builds a string from record object.
       def to_s!
         self.class.fields.map do |name|
-          raise EmptyField.new(name, self) if @fields[name].nil?
+          raise EmptyFieldError.new(name, self) if @fields[name].nil?
           Formatter.format name, @fields[name]
         end.join
       end
@@ -105,7 +98,7 @@ module ACH
       end
       private :defaults
       
-      def []= name, val
+      def []=(name, val)
         fields[name] = val
       end
       private :[]=

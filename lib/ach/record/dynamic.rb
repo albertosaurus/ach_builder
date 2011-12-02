@@ -2,18 +2,18 @@ module ACH
   module Record
     class Dynamic < Base
       class DuplicateFormatError < ArgumentError
-        def initialize field_name
+        def initialize(field_name)
           super "Rule #{field_name} has already been defined"
         end
       end
       
       class UndefinedFormatError < ArgumentError
-        def initialize field_name
+        def initialize(field_name)
           super "Unknown field #{field_name} should be supplied by format"
         end
       end
       
-      def self.method_missing field, *args
+      def self.method_missing(field, *args)
         format, default = args.first.is_a?(Hash) ? args.first.first : args
         unless format =~ Formatter::Rule::RULE_PARSER_REGEX
           default, format = format, nil

@@ -35,7 +35,7 @@ describe ACH::Record::Base do
   context "creating record from string" do
     before :each do
       @content = "JOHN SMITH            0000000005"
-      @record  = @test_record.from_str @content
+      @record  = @test_record.from_s @content
     end
 
     it "should be an instance of ACH::Record" do

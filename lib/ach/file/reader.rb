@@ -1,44 +1,96 @@
 module ACH
-  module File::Reader
-    def self.from_string(string)
-      to_ach string
+  class File::Reader
+    def initialize(enum)
+      @enum = enum
     end
 
-    def self.from_file(filename)
-      read_file(filename) do |string|
-        from_string string
-      end
-    end
+    def to_ach
+      header_line, batch_lines, control_line = ach_data
 
-    def self.parse(string)
-      Parser.run(string)
-    end
+      File.new do
+        build_header header_line
 
-    def self.to_ach(string)
-      header_row, batches_rows, control_row = parse(string)
+        batch_lines.each do |batch_data|
+          batch do
+            build_header batch_data[:header]
 
-      File.new.tap do |file|
-        file.header = File::Header.from_str(header_row)
+            batch_data[:entries].each do |entry_line|
+              build_entry entry_line
 
-        batches_rows.each do |batch_params|
-          file.batches << Batch.new.tap do |batch|
-            batch.header = Batch::Header.from_str(batch_params[:header])
-            batch.entries << Record::Entry.from_str(batch_params[:entry])
-            batch_params[:addendas].each do |str|
-              batch.addenda Record::Addenda.from_str(str).fields
+              if batch_data[:addendas].key?(entry_line)
+                batch_data[:addendas][entry_line].each do |addenda_line|
+                  build_addenda addenda_line
+                end
+              end
             end
-            batch.control = Batch::Control.from_str(batch_params[:control])
+
+            build_control batch_data[:control]
           end
         end
 
-        file.control = File::Control.from_str(control_row)
+        build_control control_line
       end
     end
 
-    def self.read_file(filename)
-      ::File.open(filename) do |fh|
-        yield fh.read
+    def ach_data
+      process! unless processed?
+
+      return @header, batches, @control
+    end
+    private :ach_data
+
+    def process!
+      each_line do |record_type, line|
+        case record_type
+        when Constants::FILE_HEADER_RECORD_TYPE
+          @header = line
+        when Constants::BATCH_HEADER_RECORD_TYPE
+          initialize_batch!
+          current_batch[:header] = line
+        when Constants::BATCH_ENTRY_RECORD_TYPE
+          current_batch[:entries] << line
+        when Constants::BATCH_ADDENDA_RECORD_TYPE
+          (current_batch[:addendas][current_entry] ||= []) << line
+        when Constants::BATCH_CONTROL_RECORD_TYPE
+          current_batch[:control] = line
+        when Constants::FILE_CONTROL_RECORD_TYPE
+          @control = line
+        end
+      end
+      @processed = true
+    end
+    private :process!
+
+    def processed?
+      !!@processed
+    end
+    private :processed?
+
+    def each_line
+      @enum.each do |line|
+        yield line[0..0].to_i, line.chomp
       end
     end
+    private :each_line
+
+    def batches
+      @batches ||= []
+    end
+    private :batches
+
+    def initialize_batch!
+      batches << {:entries => [], :addendas => {}}
+    end
+    private :initialize_batch!
+
+    def current_batch
+      batches.last
+    end
+    private :current_batch
+
+    def current_entry
+      current_batch[:entries].last
+    end
+    private :current_entry
   end
 end

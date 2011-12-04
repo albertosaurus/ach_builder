@@ -14,14 +14,14 @@ module ACH
 
     include Validations
     include Constants
-    
+
     # Exception raised on attempt to assign a value to nonexistent field.
     class UnknownAttributeError < ArgumentError
       def initialize field, obj
         super "Unrecognized attribute '#{field}' for #{obj}"
       end
     end
-    
+
     # If Record should be attached to (preceded by) other Record, this
     # exception is raised on attempt to create attachment record without
     # having preceder record. For example, Addenda recourds should be
@@ -45,7 +45,7 @@ module ACH
       klass.default_attributes = default_attributes.dup
       klass.after_initialize_hooks = after_initialize_hooks.dup
     end
-    
+
     def self.method_missing meth, *args
       if Formatter.defined?(meth)
         default_attributes[meth] = args.first
@@ -53,7 +53,7 @@ module ACH
         super
       end
     end
-    
+
     def initialize(fields = {}, &block)
       @attributes = {}.merge(self.class.default_attributes)
       fields.each do |name, value|
@@ -63,7 +63,7 @@ module ACH
       after_initialize
       instance_eval(&block) if block
     end
-    
+
     def method_missing(meth, *args)
       if Formatter.defined?(meth)
         args.empty? ? @attributes[meth] : (@attributes[meth] = args.first)
@@ -71,23 +71,26 @@ module ACH
         super
       end
     end
-    
+
     def before_header
     end
     private :before_header
-    
+
     # Sets header fields if fields or block passed. Returns header record.
     #
-    # = Example 1:
+    # == Example 1:
+    #
     #   header :foo => "value 1", :bar => "value 2"
     #
-    # = Example 2:
+    # == Example 2:
+    #
     #   header do
     #     foo "value 1"
     #     bar "value 2"
     #   end
     #
-    # = Example 3:
+    # == Example 3:
+    #
     #   header # => just returns a header object
     def header(fields = {}, &block)
       before_header
@@ -98,18 +101,20 @@ module ACH
       end
     end
 
-    def header=(header)
-      @header = header
-    end
-    
-    def control
-      @control || create_control!
+    def build_header(str)
+      @header = self.class::Header.from_s(str)
     end
 
-    def create_control!
-      klass  = self.class::Control
-      fields = klass.fields.select{ |f| respond_to?(f) || attributes[f] }
-      self.control = klass.new Hash[*fields.zip(fields.map{ |f| send(f) }).flatten]
+    def control
+      @control ||= begin
+        klass  = self.class::Control
+        fields = klass.fields.select{ |f| respond_to?(f) || attributes[f] }
+        klass.new Hash[*fields.zip(fields.map{ |f| send(f) }).flatten]
+      end
+    end
+
+    def build_control(str)
+      @control = self.class::Control.from_s(str)
     end
     
     def fields_for(component_or_class)
@@ -127,7 +132,9 @@ module ACH
     end
     
     # Creates has many association.
-    # = Example:
+    #
+    # == Example:
+    #
     #    class File < Component
     #      has_many :batches
     #    end
@@ -137,39 +144,45 @@ module ACH
     #    end
     #
     #    file.batches  # => [#<Batch ...>]
+    #
     # The example above extends File with #batches and #batch instance methods:
     # * #batch is used to add new instance of Batch.
     # * #batches is used to get an array of batches which belong to file.
     def self.has_many(plural_name, options = {})
       attr_reader plural_name
-      
+
       proc_defaults = options[:proc_defaults]
       linked_to = options[:linked_to]
-      
+
       singular_name = plural_name.to_s.singularize
       camelized_singular_name = singular_name.camelize.to_sym
       klass = ACH.to_const(camelized_singular_name)
-      
+
+      define_method("build_#{singular_name}") do |str|
+        obj = klass.from_s(str)
+        send("container_for_#{singular_name}") << obj
+      end
+
+      define_method("container_for_#{singular_name}") do
+        return send(plural_name) unless linked_to
+
+        last_link = send(linked_to).last
+        raise NoLinkError.new(linked_to.to_s.singularize, klass.name) unless last_link
+        send(plural_name)[last_link] ||= []
+      end
+
       define_method(singular_name) do |*args, &block|
-        index_or_fields = args.first || {}
-        return send(plural_name)[index_or_fields] if Fixnum === index_or_fields
-        
+        fields = args.first || {}
+
         defaults = proc_defaults ? instance_exec(&proc_defaults) : {}
 
-        klass.new(fields_for(singular_name).merge(defaults).merge(index_or_fields)).tap do |component|
-          if linked_to
-            last_link = send(linked_to).last
-            raise NoLinkError.new(linked_to.to_s.singularize, klass.name) unless last_link
-            container = (send(plural_name)[last_link] ||= [])
-          else
-            container = send(plural_name)
-          end
+        klass.new(fields_for(singular_name).merge(defaults).merge(fields)).tap do |component|
           component.instance_eval(&block) if block
-          container << component
+          send("container_for_#{singular_name}") << component
         end
       end
       
-      after_initialize_hooks << lambda { instance_variable_set("@#{plural_name}", linked_to ? {} : []) }
+      after_initialize_hooks << lambda{ instance_variable_set("@#{plural_name}", linked_to ? {} : []) }
     end
   end
 end

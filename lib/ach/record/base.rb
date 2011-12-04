@@ -67,7 +67,7 @@ module ACH
       end
       private_class_method :define_field_methods
 
-      def self.from_str(string)
+      def self.from_s(string)
         field_matcher_regexp = Formatter.matcher_for(fields)
         new Hash[*fields.zip(string.match(field_matcher_regexp)[1..-1]).flatten]
       end

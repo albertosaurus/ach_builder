@@ -66,7 +66,7 @@ describe ACH::Batch do
   
   it "should have header and control record with length of 94" do
     [:header, :control].each do |record|
-      @file.batch(0).send(record).to_s!.length.should == ACH::Constants::RECORD_SIZE
+      @file.batches[0].send(record).to_s!.length.should == ACH::Constants::RECORD_SIZE
     end
   end
 

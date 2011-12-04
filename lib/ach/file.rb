@@ -1,9 +1,9 @@
 module ACH
-  # {ACH::File ACH::File} represents an ACH file. Every file have {ACH::File::Header header}
-  # and {ACH::File::Control control} records and number of {ACH::Batch batches}.
+  # {ACH::File ACH::File} represents an ACH file. Every file has {ACH::File::Header header}
+  # and {ACH::File::Control control} records and variable number of {ACH::Batch batches}.
   # {ACH::File::TransmissionHeader Transmission header} is optional.
   #
-  # = Example:
+  # == Example:
   #
   #   # Inherit File to set default values
   #   class CustomAchFile < ACH::File
@@ -44,7 +44,9 @@ module ACH
     has_many :batches, :proc_defaults => lambda{ {:batch_number => batches.length + 1} }
 
     def self.read(filename)
-      Reader.from_file filename
+      ::File.open(filename) do |fh|
+        Reader.new(fh).to_ach
+      end
     end
   end
 end

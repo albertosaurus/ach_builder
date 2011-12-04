@@ -58,18 +58,18 @@ describe ACH::File do
     end
 
     it "should return a batch when index is passed" do
-      @file_with_batch.batch(0).should be_instance_of(ACH::Batch)
+      @file_with_batch.batches[0].should be_instance_of(ACH::Batch)
     end
 
     it "should assign a batch_number to a batch" do
-      batch = @file_with_batch.batch(0)
+      batch = @file_with_batch.batches[0]
       batch.batch_number.should == 1
       batch = @file_with_batch.batch(:entry_class_code => 'WEB')
       batch.batch_number.should == 2
     end
 
     it "should assign attributes to a batch" do
-      batch = @file_with_batch.batch(0)
+      batch = @file_with_batch.batches[0]
       batch.attributes.should include(@file_with_batch.attributes)
     end
 

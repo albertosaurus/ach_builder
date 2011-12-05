@@ -1,6 +1,8 @@
 module ACH
-  # Every {ACH::Batch batch} components ends with batch control record.
-  # == Fields:
+  # Every ACH::Batch component ends with a batch control record
+  #
+  # == Fields
+  #
   # * record_type
   # * service_class_code
   # * entry_addenda_count

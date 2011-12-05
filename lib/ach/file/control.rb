@@ -1,6 +1,8 @@
 module ACH
-  # Every {ACH::File ACH file} ends with file control record.
+  # Every ACH::File ACH file ends with file control record.
+  #
   # == Fields:
+  #
   # * record_type
   # * batch_count
   # * block_count

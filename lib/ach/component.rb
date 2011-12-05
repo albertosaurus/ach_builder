@@ -1,10 +1,10 @@
 module ACH
-  # Base class for {ACH::File} and {ACH::Batch}. Every component has its own 
-  # number of entities, header and control records. So it provides 
-  # {ACH::Component#header}, {ACH::Component#control}, {ACH::Component.has_many}
-  # methods to manage them.
+  # Base class for ACH::File and ACH::Batch. Every component has its own number
+  # of entities, header and control records. So it provides ACH::Component#header,
+  # ACH::Component#control, ACH::Component.has_many methods to manage them.
   #
-  # == Example:
+  # == Example
+  #
   #    class File < Component
   #      has_many :batches
   #      # implementation
@@ -24,7 +24,7 @@ module ACH
 
     # If Record should be attached to (preceded by) other Record, this
     # exception is raised on attempt to create attachment record without
-    # having preceder record. For example, Addenda recourds should be
+    # having preceded record. For example, Addenda records should be
     # created after Entry records. Each new Addenda record will be attached
     # to the latest Entry record.
     class NoLinkError < ArgumentError
@@ -39,14 +39,22 @@ module ACH
     self.after_initialize_hooks = []
 
     attr_reader :attributes
-    attr_writer :control
 
     def self.inherited(klass)
       klass.default_attributes = default_attributes.dup
       klass.after_initialize_hooks = after_initialize_hooks.dup
     end
 
-    def self.method_missing meth, *args
+    # Uses +method_missing+ pattern to specify default attributes for a +Component+.
+    # If method name is one of the defined rules, saves it to +default_attributes+ has
+    #
+    # These attributes are passed to inner components in a cascade way, i.e. when ACH
+    # File was defined with default value for 'company_name', this value will be passed
+    # to every Batch component within file, and from every Batch to corresponding batch
+    # header record.
+    #
+    # Note that default values may be overwritten when building records.
+    def self.method_missing(meth, *args)
       if Formatter.defined?(meth)
         default_attributes[meth] = args.first
       else
@@ -72,24 +80,24 @@ module ACH
       end
     end
 
-    def before_header
+    def before_header # :nodoc:
     end
     private :before_header
 
     # Sets header fields if fields or block passed. Returns header record.
     #
-    # == Example 1:
+    # == Example 1
     #
     #   header :foo => "value 1", :bar => "value 2"
     #
-    # == Example 2:
+    # == Example 2
     #
     #   header do
     #     foo "value 1"
     #     bar "value 2"
     #   end
     #
-    # == Example 3:
+    # == Example 3
     #
     #   header # => just returns a header object
     def header(fields = {}, &block)
@@ -101,7 +109,7 @@ module ACH
       end
     end
 
-    def build_header(str)
+    def build_header(str) # :nodoc:
       @header = self.class::Header.from_s(str)
     end
 
@@ -113,7 +121,7 @@ module ACH
       end
     end
 
-    def build_control(str)
+    def build_control(str) # :nodoc:
       @control = self.class::Control.from_s(str)
     end
     
@@ -127,13 +135,13 @@ module ACH
       end
     end
 
-    def after_initialize
+    def after_initialize # :nodoc:
       self.class.after_initialize_hooks.each{ |hook| instance_exec(&hook) }
     end
     
     # Creates has many association.
     #
-    # == Example:
+    # == Example
     #
     #    class File < Component
     #      has_many :batches

@@ -67,12 +67,12 @@ module ACH
       head + batches.map(&:to_ach).flatten + [control] + tail
     end
 
-    # Returns array of {ACH::Record::Tail tail} records, based on +tails_count+
+    # Returns array of ACH::Record::Tail records, based on +tails_count+
     def tail
       [ Record::Tail.new ] * tails_count
     end
 
-    # Returns amount of {ACH::Record::Tail tail} records, required to append to
+    # Returns amount of ACH::Record::Tail records, required to append to
     # string representation of a file to match proper amount of blocks.
     def tails_count
       block_count * Constants::BLOCKING_FACTOR - record_count

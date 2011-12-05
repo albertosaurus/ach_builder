@@ -1,6 +1,8 @@
 module ACH
-  # Every {ACH::Batch batch} component start with batch header record.
-  # == Fields:
+  # Every ACH::Batch component starts with a batch header record
+  #
+  # == Fields
+  #
   # * record_type
   # * service_class_code
   # * company_name

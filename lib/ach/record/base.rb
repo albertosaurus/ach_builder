@@ -1,22 +1,28 @@
 module ACH
   module Record
-    # Base class for all record entities({ACH::File::Header file header record},
-    # {ACH::File::Control file control record}, {ACH::Entry entries} etc.).
-    # Any record entity must inherit {ACH::Record ACH::Record}.
-    # All fields specified with {ACH::Record#fields fields} method must be 
-    # declared in {ACH::Formatter Formatter}.
+    # Base class for all record entities (<tt>ACH::File::Header</tt>,
+    # <tt>ACH::File::Control</tt>, <tt>ACH::Record::Entry</tt>, others). Any record
+    # being declared should specify it's fields, and optional default values.
+    # Except for <tt>ACH::Record::Dynamic</tt>, any declared field within a record
+    # should have corresponding rule defined under <tt>ACH::Rule::Formatter</tt>
     #
     # == Example
+    #
     #   class Addenda < Record
     #     fields :record_type,
     #            :addenda_type_code,
     #            :payment_related_info,
     #            :addenda_sequence_num,
     #            :entry_details_sequence_num
+    #     
     #     defaults :record_type => 7
     #   end
-    #
-    #   addenda = ACH::Addenda.new(:addenda_type_code => '05', :payment_related_info => 'PAYMENT_RELATED_INFO', :addenda_sequence_num => 1, :entry_details_sequence_num => 1)
+    #   
+    #   addenda = ACH::Addenda.new(
+    #     :addenda_type_code => '05',
+    #     :payment_related_info => 'PAYMENT_RELATED_INFO',
+    #     :addenda_sequence_num => 1,
+    #     :entry_details_sequence_num => 1 )
     #   addenda.to_s! # => "705PAYMENT_RELATED_INFO                                                            00010000001"
     class Base
       include Validations
@@ -38,19 +44,15 @@ module ACH
       end
       
       # Specifies fields of the record. Order is important. All fields
-      # must be declared in {ACH::Formatter Formatter}.
-      # == Example:
-      #    fields :foo, :bar
+      # must be declared in ACH::Formatter +RULES+. See class description
+      # for example
       def self.fields(*field_names)
         return @fields if field_names.empty?
         @fields = field_names
         @fields.each{ |field| define_field_methods(field) }
       end
       
-      # Sets default values for fields.
-      # == Example:
-      #    defaults :foo => "foo value",
-      #             :bar => "bar value"
+      # Sets default values for fields. See class description for example
       def self.defaults(default_values = nil)
         return @defaults if default_values.nil?
         @defaults = default_values.freeze

@@ -1,9 +1,9 @@
 module ACH
-  # {ACH::File ACH::File} represents an ACH file. Every file has {ACH::File::Header header}
-  # and {ACH::File::Control control} records and variable number of {ACH::Batch batches}.
-  # {ACH::File::TransmissionHeader Transmission header} is optional.
+  # ACH::File instances represent actual ACH files. Every file has ACH::File::Header header
+  # and ACH::File::Control control records and variable number of ACH::Batch batches.
+  # ACH::File::TransmissionHeader is optional.
   #
-  # == Example:
+  # == Example
   #
   #   # Inherit File to set default values
   #   class CustomAchFile < ACH::File
@@ -37,12 +37,15 @@ module ACH
     autoload :Control
     autoload :Header
     autoload :TransmissionHeader
+    autoload :Reader
 
     include Builder
     include TransmissionHeader
 
     has_many :batches, :proc_defaults => lambda{ {:batch_number => batches.length + 1} }
 
+    # Opens a +filename+ and passes it's handler to the ACH::Reader object, which uses it as
+    # enum to scan for ACH contents line by line.
     def self.read(filename)
       ::File.open(filename) do |fh|
         Reader.new(fh).to_ach

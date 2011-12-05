@@ -1,5 +1,11 @@
 module ACH
+  # The main purpose of +Reader+ class is to build a corresponding <tt>ACH::File</tt>
+  # object from a given set of data. Takes +enum+ object for constructor, which
+  # represents a sequence of ACH lines (strings). This enum object may be a file
+  # handler, or an array, or any other object that responds to +each+ method.
   class File::Reader
+    include Constants
+
     def initialize(enum)
       @enum = enum
     end
@@ -42,18 +48,18 @@ module ACH
     def process!
       each_line do |record_type, line|
         case record_type
-        when Constants::FILE_HEADER_RECORD_TYPE
+        when FILE_HEADER_RECORD_TYPE
           @header = line
-        when Constants::BATCH_HEADER_RECORD_TYPE
+        when BATCH_HEADER_RECORD_TYPE
           initialize_batch!
           current_batch[:header] = line
-        when Constants::BATCH_ENTRY_RECORD_TYPE
+        when BATCH_ENTRY_RECORD_TYPE
           current_batch[:entries] << line
-        when Constants::BATCH_ADDENDA_RECORD_TYPE
+        when BATCH_ADDENDA_RECORD_TYPE
           (current_batch[:addendas][current_entry] ||= []) << line
-        when Constants::BATCH_CONTROL_RECORD_TYPE
+        when BATCH_CONTROL_RECORD_TYPE
           current_batch[:control] = line
-        when Constants::FILE_CONTROL_RECORD_TYPE
+        when FILE_CONTROL_RECORD_TYPE
           @control = line
         end
       end

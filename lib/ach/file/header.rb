@@ -1,7 +1,9 @@
 module ACH
-  # File header record is the first {ACH::Record record} of every ACH file(in case when
-  # {ACH::File::TransmissionHeader transmission header} is absent).
+  # File header record is the first record of every ACH file (in case when
+  # ACH::File::TransmissionHeader record is absent).
+  #
   # == Fields:
+  #
   # * record_type
   # * priority_code
   # * immediate_dest

@@ -5,7 +5,7 @@ module ACH
   # +TransmissionHeader+ may be defined only once per file. You may specify default
   # value for custom fields during definition
   #
-  # == Example:
+  # == Example
   #
   #   class MyFile < ACH::File
   #     trasmission_header do

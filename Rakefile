@@ -14,13 +14,14 @@ class Rake::Task
     @actions.clear
   end
 
-  def overwrite(&block)
+  def overwrite(description = nil, &block)
     abandon
+    add_description description
     enhance(&block)
   end
 end
 
-Rake::Task['release'].overwrite do
+Rake::Task['release'].overwrite("DON'T DO THIS!") do
   puts "#{`whoami`.strip}, you don't want to release to RubyGems, do you?"
 end
 

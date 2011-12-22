@@ -8,6 +8,9 @@ require 'active_support/core_ext/class/attribute'
 
 require "ach/version"
 
+# Support for building the files necessary for the bulk exchange of debits and
+# credits with financial institutions via the Automated Clearing House system,
+# governed by NACHA ( http://www.nacha.org/ ).
 module ACH
   extend ActiveSupport::Autoload
 

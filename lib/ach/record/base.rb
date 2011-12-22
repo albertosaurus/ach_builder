@@ -28,7 +28,7 @@ module ACH
       include Validations
       include Constants
       
-      # Raises when unknown field passed to {ACH::Record.fields Record.fields} method
+      # Raises when unknown field passed to ACH::Record::Base.fields method.
       class UnknownFieldError < ArgumentError
         def initialize(field, class_name)
           super "Unrecognized field '#{field}' in class #{class_name}"

@@ -51,6 +51,13 @@ describe ACH::Component::HasManyAssociation do
       end
     end
 
+    describe "reassignment" do
+      it "should raise error" do
+        assigned = @association.for(Object.new)
+        expect{ assigned.for(Object.new) }.to raise_error(ACH::Component::HasManyAssociation::DoubleAssignmentError)
+      end
+    end
+
     describe "without :linked_to option" do
       it "should have Array as container" do
         @association.container.should be_an Array

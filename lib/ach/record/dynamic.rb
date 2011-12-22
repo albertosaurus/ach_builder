@@ -1,11 +1,11 @@
 module ACH
   module Record
-    # Descendants of <tt>ACH::Record::Dynamic</tt> class are the only
+    # Descendants of +ACH::Record::Dynamic+ class are the only
     # records allowed to have previously undefined fields. However,
     # each new field definition requires a rule string to be passed.
     # +UndefinedFormatError+ will be raised otherwise. If the field
-    # has already been defined, and new rule string is passed,
-    # +DuplocateFormatError+ is raised.
+    # has already been defined, and a new rule string is passed,
+    # a +DuplicateFormatError+ is raised.
     #
     # == Example
     #
@@ -17,13 +17,13 @@ module ACH
     #
     # This example declares a +CustomHeader+ record type with following
     # fields:
-    # * <tt>request_type</tt>, defined by rule '<-9-' with a default
+    # * +request_type+, defined by rule '<-9-' with a default
     # value of '$$ADD ID='
-    # * <tt>remote_id</tt> with no default value
-    # * <tt>file_type</tt> with default value of 'NWFACH'
+    # * +remote_id+ with no default value
+    # * +file_type+ with default value of 'NWFACH'
     #
-    # Note that passing two arguments to method call is equivalent to
-    # passing a hash with a single key-value pair
+    # Note: passing two arguments to method call is equivalent to
+    # passing a hash with a single key-value pair.
     class Dynamic < Base
       class DuplicateFormatError < ArgumentError
         def initialize(field_name)

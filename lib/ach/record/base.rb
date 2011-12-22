@@ -1,10 +1,10 @@
 module ACH
   module Record
-    # Base class for all record entities (<tt>ACH::File::Header</tt>,
-    # <tt>ACH::File::Control</tt>, <tt>ACH::Record::Entry</tt>, others). Any record
-    # being declared should specify it's fields, and optional default values.
-    # Except for <tt>ACH::Record::Dynamic</tt>, any declared field within a record
-    # should have corresponding rule defined under <tt>ACH::Rule::Formatter</tt>
+    # Base class for all record entities (e.g. +ACH::File::Header+,
+    # +ACH::File::Control+, +ACH::Record::Entry+, others). Any record
+    # being declared should specify its fields, and optional default values.
+    # Except for +ACH::Record::Dynamic+, any declared field within a record
+    # should have corresponding rule defined under +ACH::Rule::Formatter+.
     #
     # == Example
     #

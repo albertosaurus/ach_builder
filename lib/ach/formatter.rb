@@ -89,7 +89,7 @@ module ACH
       RULES[field] = format
     end
 
-    # If missing method name is one of the defined rules, passes it's name
+    # If missing method name is one of the defined rules, passes its name
     # and the rest of arguments to the +format+ method
     def self.method_missing(meth, *args)
       self.defined?(meth) ? format(meth, *args) : super

@@ -1,5 +1,5 @@
 module ACH
-  # Every ACH::Batch component ends with a batch control record
+  # Every ACH::Batch component ends with a batch control record.
   #
   # == Fields
   #

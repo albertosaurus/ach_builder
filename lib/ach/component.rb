@@ -45,8 +45,9 @@ module ACH
       klass.after_initialize_hooks = after_initialize_hooks.dup
     end
 
-    # Uses +method_missing+ pattern to specify default attributes for a +Component+.
-    # If method name is one of the defined rules, saves it to +default_attributes+ has
+    # Uses +method_missing+ pattern to specify default attributes for a
+    # +Component+. If method name is one of the defined rules, saves it to
+    # +default_attributes+ hash.
     #
     # These attributes are passed to inner components in a cascade way, i.e. when ACH
     # File was defined with default value for 'company_name', this value will be passed

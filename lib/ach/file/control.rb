@@ -1,5 +1,5 @@
 module ACH
-  # Every ACH::File ACH file ends with file control record.
+  # Every ACH::File ends with an ACH::File::Control record.
   #
   # == Fields:
   #

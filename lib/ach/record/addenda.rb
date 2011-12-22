@@ -1,7 +1,8 @@
 module ACH
   module Record
-    # Addenda is ACH::Record::Base record which is located inside of ACH::Batch component.
-    # Addenda records should be preceded by ACH::Record::Entry entry records
+    # An ACH::Record::Addenda is an ACH::Record::Base record located inside of
+    # an ACH::Batch component. An addenda record should be preceded by an
+    # ACH::Record::Entry record.
     #
     # == Fields
     #

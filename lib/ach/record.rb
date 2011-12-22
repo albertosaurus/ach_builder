@@ -1,7 +1,8 @@
 module ACH
-  # Hosts the most record classes available in ACH functionality. Records
-  # not included in this module are ACH::File::Header, ACH::File::Control,
-  # ACH::Batch::Header, ACH::Batch::Control
+  # Responsible for record-specific functionality for most record types,
+  # handled by several subclasses. Record types handled outside this module
+  # include: ACH::File::Header, ACH::File::Control, ACH::Batch::Header,
+  # ACH::Batch::Control
   module Record
     extend ActiveSupport::Autoload
 

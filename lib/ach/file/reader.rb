@@ -1,8 +1,9 @@
 module ACH
-  # The main purpose of +Reader+ class is to build a corresponding <tt>ACH::File</tt>
-  # object from a given set of data. Takes +enum+ object for constructor, which
-  # represents a sequence of ACH lines (strings). This enum object may be a file
-  # handler, or an array, or any other object that responds to +each+ method.
+  # The +ACH::File::Reader+ class builds a corresponding +ACH::File+
+  # object from a given set of data. The constructor takes an +enum+ object
+  # representing a sequence of ACH lines (strings). This +enum+ object may be
+  # a file handler, an array, or any other object that responds to the +#each+
+  # method.
   class File::Reader
     include Constants
 

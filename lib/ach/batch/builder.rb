@@ -1,14 +1,13 @@
 module ACH
-  # This module hosts all the methods required for building string representation of a
-  # particular instance of an ACH batch. For the most, defines helper methods used for
-  # building ACH lines. Included by the ACH::File.
+  # Supports building a string representation of a particular instance of an
+  # ACH batch. Supports building ACH lines. Included by ACH::File.
   module Batch::Builder
     # Returns +true+ if any of internal ACH entries has 'credit' transaction code
     def has_credit?
       entries.any?(&:credit?)
     end
 
-    # Returns +true+ if any of internal ACH entries has 'debit' transaction code
+    # Returns +true+ if any internal ACH entry has 'debit' transaction code
     def has_debit?
       entries.any?(&:debit?)
     end

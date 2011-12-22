@@ -1,7 +1,8 @@
 module ACH
   module Record
-    # Entry is inherited from ACH::Record::Base and is located within ACH::Batch component.
-    # It is the main record for representing a particular transaction
+    # A subclass of ACH::Record::Base, an Entry appears in an ACH::Batch
+    # component. It is the main record for representing a particular
+    # transaction.
     #
     # == Fields
     #

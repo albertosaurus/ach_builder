@@ -1,8 +1,14 @@
 module ACH
   module Constants
+    # The length of each record in characters.
     RECORD_SIZE     = 94
+    # The file's total record count must be a multiple of this number. The
+    # file must be padded with blocking file control records (consisting
+    # entirely of 9s) to satisfy this condition.
     BLOCKING_FACTOR = 10
+    # Always "1".
     FORMAT_CODE     = 1
+    # This character must be used to delimit each row.
     ROWS_DELIMITER  = "\n"
 
     FILE_HEADER_RECORD_TYPE   = 1

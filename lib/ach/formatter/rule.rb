@@ -1,6 +1,7 @@
 module ACH
   # Parses string representation of rule and builds a +Proc+ based on it
   class Formatter::Rule
+    # Captures formatting tokens from a rule string.
     RULE_PARSER_REGEX = /^(<-|->)(\d+)(-)?(\|\w+)?$/
 
     delegate :call, :[], :to => :@lambda

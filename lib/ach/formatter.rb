@@ -21,6 +21,7 @@ module ACH
 
     autoload :Rule
 
+    # Rules for formatting each field. See module documentation for examples.
     RULES = {
       :customer_name            => '<-22',
       :customer_acct            => '<-15',

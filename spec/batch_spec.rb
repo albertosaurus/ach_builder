@@ -21,7 +21,7 @@ describe ACH::Batch do
   
   it "should raise error when adding addenda records without any entry" do
     batch = ACH::Batch.new
-    expect{ batch.addenda(:payment_related_info =>'foo bar') }.to raise_error(ACH::Component::NoLinkError)
+    expect{ batch.addenda(:payment_related_info =>'foo bar') }.to raise_error(ACH::Component::HasManyAssociation::NoLinkError)
   end
   
   it "should append addenda records after entry records" do

@@ -15,21 +15,12 @@ module ACH
     include Validations
     include Constants
 
+    autoload :HasManyAssociation
+
     # Exception raised on attempt to assign a value to nonexistent field.
     class UnknownAttributeError < ArgumentError
       def initialize field, obj
         super "Unrecognized attribute '#{field}' for #{obj}"
-      end
-    end
-
-    # If Record should be attached to (preceded by) other Record, this
-    # exception is raised on attempt to create attachment record without
-    # having preceded record. For example, Addenda records should be
-    # created after Entry records. Each new Addenda record will be attached
-    # to the latest Entry record.
-    class NoLinkError < ArgumentError
-      def initialize link, klass
-        super "No #{link} was found to attach a new #{klass}"
       end
     end
     
@@ -126,13 +117,12 @@ module ACH
       @control = self.class::Control.from_s(str)
     end
     
-    def fields_for(component_or_class)
-      klass = component_or_class.is_a?(Class) ? component_or_class : ACH.to_const(component_or_class.camelize)
+    def fields_for(klass)
       if klass < Component
         attributes
       else
         attrs = attributes.find_all{ |k, v| klass.fields.include?(k) && attributes[k] }
-        Hash[*(attrs.flatten)]
+        Hash[*attrs.flatten]
       end
     end
 
@@ -158,40 +148,14 @@ module ACH
     # * #batch is used to add new instance of Batch.
     # * #batches is used to get an array of batches which belong to file.
     def self.has_many(plural_name, options = {})
-      attr_reader plural_name
+      association = HasManyAssociation.new(plural_name, options)
 
-      proc_defaults = options[:proc_defaults]
-      linked_to = options[:linked_to]
-
-      singular_name = plural_name.to_s.singularize
-      camelized_singular_name = singular_name.camelize.to_sym
-      klass = ACH.to_const(camelized_singular_name)
-
-      define_method("build_#{singular_name}") do |str|
-        obj = klass.from_s(str)
-        send("container_for_#{singular_name}") << obj
+      association_variable_name = "@#{plural_name}_association"
+      association.delegation_methods.each do |method_name|
+        delegate method_name, :to => association_variable_name
       end
 
-      define_method("container_for_#{singular_name}") do
-        return send(plural_name) unless linked_to
-
-        last_link = send(linked_to).last
-        raise NoLinkError.new(linked_to.to_s.singularize, klass.name) unless last_link
-        send(plural_name)[last_link] ||= []
-      end
-
-      define_method(singular_name) do |*args, &block|
-        fields = args.first || {}
-
-        defaults = proc_defaults ? instance_exec(&proc_defaults) : {}
-
-        klass.new(fields_for(singular_name).merge(defaults).merge(fields)).tap do |component|
-          component.instance_eval(&block) if block
-          send("container_for_#{singular_name}") << component
-        end
-      end
-      
-      after_initialize_hooks << lambda{ instance_variable_set("@#{plural_name}", linked_to ? {} : []) }
+      after_initialize_hooks << lambda{ instance_variable_set(association_variable_name, association.for(self)) }
     end
   end
 end

@@ -8,7 +8,7 @@ describe ACH::Batch do
   
   it "should create entry with attributes in hash form" do
     entry = @batch.entry :amount => 100
-    entry.should be_instance_of(ACH::Entry)
+    entry.should be_instance_of(ACH::Record::Entry)
     entry.amount.should == 100
   end
   
@@ -21,7 +21,7 @@ describe ACH::Batch do
   
   it "should raise error when adding addenda records without any entry" do
     batch = ACH::Batch.new
-    expect{ batch.addenda(:payment_related_info =>'foo bar') }.to raise_error(ACH::Component::NoLinkError)
+    expect{ batch.addenda(:payment_related_info =>'foo bar') }.to raise_error(ACH::Component::HasManyAssociation::NoLinkError)
   end
   
   it "should append addenda records after entry records" do
@@ -30,7 +30,7 @@ describe ACH::Batch do
       batch.entry(:amount => 100)
       i.times{ batch.addenda(:payment_related_info => 'foo bar') }
     end
-    batch.to_ach.map(&:class)[1...-1].should == [ACH::Entry, ACH::Entry, ACH::Addenda, ACH::Entry, ACH::Addenda, ACH::Addenda]
+    batch.to_ach.map(&:class)[1...-1].should == [ACH::Record::Entry, ACH::Record::Entry, ACH::Record::Addenda, ACH::Record::Entry, ACH::Record::Addenda, ACH::Record::Addenda]
   end
   
   it "should return false for has_credit? and has_debit? for empty entries" do
@@ -66,7 +66,7 @@ describe ACH::Batch do
   
   it "should have header and control record with length of 94" do
     [:header, :control].each do |record|
-      @file.batch(0).send(record).to_s!.length.should == ACH::Constants::RECORD_SIZE
+      @file.batches[0].send(record).to_s!.length.should == ACH::Constants::RECORD_SIZE
     end
   end
 

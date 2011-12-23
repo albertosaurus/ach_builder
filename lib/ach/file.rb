@@ -1,11 +1,12 @@
 module ACH
-  # {ACH::File ACH::File} represents an ACH file. Every file have {ACH::File::Header header}
-  # and {ACH::File::Control control} records and number of {ACH::Batch batches}.
-  # {ACH::File::TransmissionHeader Transmission header} is optional.
+  # An ACH::File instance represents an actual ACH file. Every file has an
+  # ACH::File::Header and ACH::File::Control records and a variable number of
+  # ACH::Batches. The ACH::File::TransmissionHeader is optional. (Refer to the
+  # target financial institution's documentation.)
   #
-  # = Example:
+  # == Example
   #
-  #   # Inherit File to set default values
+  #   # Subclass ACH::File to set default values:
   #   class CustomAchFile < ACH::File
   #     immediate_dest        '123123123'
   #     immediate_dest_name   'COMMERCE BANK'
@@ -13,7 +14,7 @@ module ACH
   #     immediate_origin_name 'MYCOMPANY'
   #   end
   #
-  #   # Create a new instance
+  #   # Create a new instance:
   #   ach_file = CustomAchFile.new do
   #     batch(:entry_class_code => "WEB", :company_entry_descr => "TV-TELCOM") do
   #       effective_date Time.now.strftime('%y%m%d')
@@ -33,95 +34,23 @@ module ACH
   #   # write to file
   #   ach_file.write('custom_ach.txt')
   class File < Component
-    class RedefinedTransmissionHeader < RuntimeError
-      def initialize
-        super "TransmissionHeader record may be defined only once"
-      end
-    end
-    
-    class EmptyTransmissionHeader < RuntimeError
-      def initialize
-        super "Transmission_header should declare it's fields"
-      end
-    end
-    
-    has_many :batches, :proc_defaults => lambda{ {:batch_number => batches.length + 1} }
-    
-    def self.transmission_header &block
-      raise RedefinedTransmissionHeader if have_transmission_header?
-      klass = Class.new(Record::Dynamic, &block)
-      raise EmptyTransmissionHeader.new if klass.fields.nil? || klass.fields.empty?
-      const_set(:TransmissionHeader, klass)
-      @have_transmission_header = true
-    end
-    
-    def self.have_transmission_header?
-      @have_transmission_header
-    end
-    
-    def have_transmission_header?
-      self.class.have_transmission_header?
-    end
-    
-    def transmission_header(fields = {}, &block)
-      return nil unless have_transmission_header?
-      merged_fields = fields_for(self.class::TransmissionHeader).merge(fields)
-      @transmission_header ||= self.class::TransmissionHeader.new(merged_fields)
-      @transmission_header.tap do |head|
-        head.instance_eval(&block) if block
-      end
-    end
-    
-    def batch_count
-      batches.length
-    end
-    
-    def block_count
-      ((file_entry_addenda_count + batch_count*2 + 2).to_f / BLOCKING_FACTOR).ceil
-    end
-    
-    def file_entry_addenda_count
-      batches.map{ |batch| batch.entry_addenda_count }.inject(&:+) || 0
-    end
-    
-    def entry_hash
-      batch_sum_of(:entry_hash)
-    end
-    
-    def total_debit_amount
-      batch_sum_of(:total_debit_amount)
-    end
-    
-    def total_credit_amount
-      batch_sum_of(:total_credit_amount)
-    end
-    
-    def to_ach
-      extra = block_count * BLOCKING_FACTOR - file_entry_addenda_count - batch_count*2 - 2
-      head = [header]
-      head.unshift(transmission_header) if have_transmission_header?
-      tail = ([Tail.new] * extra).unshift(control)
-      head + batches.map(&:to_ach).flatten + tail
-    end
-    
-    def to_s!
-      to_ach.map(&:to_s!).join("\r\n") + "\r\n"
-    end
-    
-    def record_count
-      2 + batches.length * 2 + file_entry_addenda_count
-    end
-    
-    def write filename
-      return false unless valid?
-      ::File.open(filename, 'w') do |fh|
-        fh.write(to_s!)
-      end
-    end
+    autoload :Builder
+    autoload :Control
+    autoload :Header
+    autoload :TransmissionHeader
+    autoload :Reader
 
-    def batch_sum_of(meth)
-      batches.map(&meth).compact.inject(&:+)
+    include Builder
+    include TransmissionHeader
+
+    has_many :batches, :proc_defaults => lambda{ {:batch_number => batches.length + 1} }
+
+    # Opens a +filename+ and passes it's handler to the ACH::Reader object, which uses it as
+    # enum to scan for ACH contents line by line.
+    def self.read(filename)
+      ::File.open(filename) do |fh|
+        Reader.new(fh).to_ach
+      end
     end
-    private :batch_sum_of
   end
 end

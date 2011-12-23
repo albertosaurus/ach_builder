@@ -1,4 +1,6 @@
 module ACH
+  # This module hosts the most basic validations for both +components+ and
+  # +records+. The only validation being performed is presence validation.
   module Validations
     def valid?
       reset_errors!

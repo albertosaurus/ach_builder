@@ -2,23 +2,26 @@ module ACH
   # Every field should be formatted with its own rule so Formatter take care about it.
   # Rules are defined in ACH::RULES constant.
   #
-  # == Rule format:
+  # == Rule Format
+  #
   # Every rule can contain the next items:
   # * _justification_  - "<-" or "->".
   # * _width_          - a number of characters for a field.
-  # * _padding_        - if "-" setted pads with spaces otherwise uses zeros.
+  # * _padding_        - specifying "-" will pad right-justified values with spaces instead of zeros.
   # * _transformation_ - allows to call method on a string. Pipe must precedes a method name. Foe example: "|upcase".
   # For real examples see RULES constants.
   #
-  # == Usage example:
+  # == Usage Example
+  #
   #    ACH::Formatter.format(:customer_name, "LINUS TORVALDS")  # => "LINUS TORVALDS        "
   #    ACH::Formatter.format(:amount, 52)                       # => "0000000052"
+  #    ACH::Formatter.customer_acct('1234567890')               # => "1234567890     "
   module Formatter
-    extend self
+    extend ActiveSupport::Autoload
 
-    mattr_accessor :compiled_rules
-    self.compiled_rules = {}
-    
+    autoload :Rule
+
+    # Rules for formatting each field. See module documentation for examples.
     RULES = {
       :customer_name            => '<-22',
       :customer_acct            => '<-15',
@@ -76,26 +79,43 @@ module ACH
       :addenda_sequence_num       => '->4',
       :entry_details_sequence_num => '->7'
     }
-    
-    def defined? field_name
+
+    # Returns +true+ if +field_name+ is one of the keys of +RULES+
+    def self.defined?(field_name)
       RULES.key?(field_name)
     end
-    
-    def define field, format
+
+    # Adds +field+ with corresponding +format+ to +RULES+
+    def self.define(field, format)
       RULES[field] = format
     end
-    
-    def method_missing meth, *args
-      defined?(meth) ? format(meth, *args) : super
+
+    # If missing method name is one of the defined rules, passes its name
+    # and the rest of arguments to the +format+ method
+    def self.method_missing(meth, *args)
+      self.defined?(meth) ? format(meth, *args) : super
     end
 
-    def format field_name, value
+    # Formats +value+ using the rule defined by +field_name+ format
+    def self.format(field_name, value)
       rule_for_field(field_name).call(value)
     end
-    
-    def rule_for_field(field)
+
+    # Returns ACH::Formatter::Rule rule, built from the corresponding format
+    # definition of a +field+
+    def self.rule_for_field(field)
       compiled_rules[field] ||= Rule.new(RULES[field])
     end
-    private :rule_for_field
+
+    # Returns a hash of all rules that have been built at the moment of method call
+    def self.compiled_rules
+      @compiled_rules ||= {}
+    end
+
+    # Returns a regular expression that can be used to split string into matched parts,
+    # that will correspond to passed +fields+ parameter. Used for ACH reading purposes
+    def self.matcher_for(fields)
+      /^#{fields.map{ |f| "(.{#{rule_for_field(f).length}})" }.join}$/
+    end
   end
 end

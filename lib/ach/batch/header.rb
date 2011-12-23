@@ -1,6 +1,8 @@
 module ACH
-  # Every {ACH::Batch batch} component start with batch header record.
-  # == Fields:
+  # Every ACH::Batch component starts with a batch header record
+  #
+  # == Fields
+  #
   # * record_type
   # * service_class_code
   # * company_name
@@ -14,7 +16,7 @@ module ACH
   # * origin_status_code
   # * origin_dfi_id
   # * batch_number
-  class Batch::Header < Record
+  class Batch::Header < Record::Base
     fields :record_type,
       :service_class_code,
       :company_name,
@@ -29,7 +31,7 @@ module ACH
       :origin_dfi_id,
       :batch_number
     
-    defaults :record_type => 5,
+    defaults :record_type => BATCH_HEADER_RECORD_TYPE,
       :service_class_code => 200,
       :company_note_data  => '',
       :date               => lambda{ Time.now.strftime("%y%m%d") },

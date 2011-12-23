@@ -1,7 +1,9 @@
 module ACH
-  # File header record is the first {ACH::Record record} of every ACH file(in case when
-  # {ACH::File::TransmissionHeader transmission header} is absent).
+  # An ACH::File::Header record is the first record of every ACH::File
+  # (in case the ACH::File::TransmissionHeader record is absent).
+  #
   # == Fields:
+  #
   # * record_type
   # * priority_code
   # * immediate_dest
@@ -15,7 +17,7 @@ module ACH
   # * immediate_dest_name
   # * immediate_origin_name
   # * reference_code
-  class File::Header < Record
+  class File::Header < Record::Base
     fields :record_type,
       :priority_code,
       :immediate_dest,
@@ -30,7 +32,7 @@ module ACH
       :immediate_origin_name,
       :reference_code
     
-    defaults :record_type => 1,
+    defaults :record_type => FILE_HEADER_RECORD_TYPE,
       :priority_code      => 1,
       :date               => lambda{ Time.now.strftime("%y%m%d") },
       :time               => lambda{ Time.now.strftime("%H%M") },

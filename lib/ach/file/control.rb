@@ -1,6 +1,8 @@
 module ACH
-  # Every {ACH::File ACH file} ends with file control record.
+  # Every ACH::File ends with an ACH::File::Control record.
+  #
   # == Fields:
+  #
   # * record_type
   # * batch_count
   # * block_count
@@ -9,7 +11,7 @@ module ACH
   # * total_debit_amount
   # * total_credit_amount
   # * bank_39
-  class File::Control < Record
+  class File::Control < Record::Base
     fields :record_type,
       :batch_count,
       :block_count,
@@ -19,7 +21,7 @@ module ACH
       :total_credit_amount,
       :bank_39
     
-    defaults :record_type => 9,
+    defaults :record_type => FILE_CONTROL_RECORD_TYPE,
       :bank_39            => ''
   end
 end

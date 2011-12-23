@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe ACH::Record do
+describe ACH::Record::Base do
   before(:all) do
-    @test_record = Class.new(ACH::Record) do
+    @test_record = Class.new(ACH::Record::Base) do
       fields :customer_name, :amount
       defaults :customer_name => 'JOHN SMITH'
     end
@@ -29,6 +29,25 @@ describe ACH::Record do
   it "should raise exception with unfilled value" do
     lambda{
       @test_record.new.to_s!
-    }.should raise_error(ACH::Record::EmptyField)
+    }.should raise_error(ACH::Record::Base::EmptyFieldError)
+  end
+
+  context "creating record from string" do
+    before :each do
+      @content = "JOHN SMITH            0000000005"
+      @record  = @test_record.from_s @content
+    end
+
+    it "should be an instance of ACH::Record" do
+      @record.is_a?(ACH::Record::Base).should be_true
+    end
+
+    it "should has correctly detected amount" do
+      @record.fields[:amount].should == '0000000005'
+    end
+
+    it "should has correctly detected customer_name" do
+      @record.fields[:customer_name].should == 'JOHN SMITH            '
+    end
   end
 end

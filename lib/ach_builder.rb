@@ -1,24 +1,28 @@
+require 'active_support/concern'
+require 'active_support/dependencies/autoload'
 require 'active_support/inflector'
 require 'active_support/ordered_hash'
-require 'active_support/core_ext/hash/deep_merge'
+require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/module/attribute_accessors'
 require 'active_support/core_ext/class/attribute'
 
 require "ach/version"
 
-require 'ach/constants'
-require 'ach/formatter'
-require 'ach/formatter/rule'
-require 'ach/validations'
-require 'ach/component'
-require 'ach/record'
-require 'ach/record/dynamic'
-require 'ach/entry'
-require 'ach/addenda'
-require 'ach/tail'
-require 'ach/batch'
-require 'ach/batch/header'
-require 'ach/batch/control'
-require 'ach/file'
-require 'ach/file/header'
-require 'ach/file/control'
+# Support for building the files necessary for the bulk exchange of debits and
+# credits with financial institutions via the Automated Clearing House system,
+# governed by NACHA ( http://www.nacha.org/ ).
+module ACH
+  extend ActiveSupport::Autoload
+
+  autoload :Constants
+  autoload :Formatter
+  autoload :Validations
+  autoload :Component
+  autoload :Record
+  autoload :Batch
+  autoload :File
+
+  def self.to_const(name)
+    [self, self::Record].detect{ |mod| mod.const_defined?(name) }.const_get(name)
+  end
+end

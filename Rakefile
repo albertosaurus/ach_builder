@@ -37,6 +37,14 @@ def gem_version_tag
   "v#{gem_version}"
 end
 
+def gem_name
+  gemspec.name
+end
+
+def gem_file_name
+  "#{gem_name}-#{gem_version}.gem"
+end
+
 namespace :git do
   desc "Create git version tag #{gem_version}"
   task :tag do
@@ -51,5 +59,12 @@ namespace :git do
   desc "Create git version tag #{gem_version} and push to GitHub"
   task :submit => [:tag, :push_tags] do
     puts "Deployed to GitHub."
+  end
+end
+
+namespace :gemfury do
+  desc "Build version #{gem_version} into the pkg directory and upload to GemFury"
+  task :push => [:build] do
+    sh "fury push pkg/#{gem_file_name} --as=TMXCredit"
   end
 end

@@ -46,6 +46,12 @@ with similar functionality
     file.write('ach_01.txt')
 ```
 
+
+## Deploying to GemFury
+Make sure you have an account on GemFury and it has been made a collaborator of the TMXCredit corporate account, then run:
+
+    rake gemfury:push
+
 ##Copyright
 
 Copyright (c) 2011 TMX Credit, released under the MIT license

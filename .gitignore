@@ -4,6 +4,7 @@ Gemfile.lock
 pkg/*
 /.yardoc
 .idea
+doc/
 
 # exclude everything in tmp
 tmp/*

@@ -5,7 +5,7 @@ require "ach/version"
 Gem::Specification.new do |s|
   s.name        = "ach_builder"
   s.version     = ACH::VERSION
-  s.authors     = ["TMX Credit", "Artem Kuzko", "Sergey Potapov", "Bruce Burdick"]
+  s.authors     = ["TMX Credit", "Artem Kuzko", "Sergey Potapov"]
   s.email       = ["rubygems@tmxcredit.com", "AKuzko@sphereconsultinginc.com", "SPotapov@sphereconsultinginc.com"]
   s.homepage    = "http://github.com/akuzko/ach_builder"
   s.summary     = "Ruby tools for building ACH files"
@@ -21,6 +21,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec"    , ">= 2.0.0"
   s.add_runtime_dependency "activesupport", ">= 2.3.0"
 
-  # Is necessary for active_support/inflector
+  # Necessary for active_support/inflector:
   s.add_runtime_dependency "i18n"
 end

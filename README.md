@@ -19,12 +19,12 @@ with similar functionality
       immediate_dest_name 'COMMERCE BANK'
       immediate_origin '123123123'
       immediate_origin_name 'MYCOMPANY'
-    
+
       ['WEB', 'TEL'].each do |code|
         batch(:entry_class_code => code, :company_entry_descr => 'TV-TELCOM') do
           effective_date Time.now.strftime('%y%m%d')
           origin_dfi_id "00000000"
-          
+
           entry :customer_name => 'JOHN SMITH',
             :customer_acct     => '61242882282',
             :amount            => '2501',
@@ -46,12 +46,6 @@ with similar functionality
     file.write('ach_01.txt')
 ```
 
-
-## Deploying to GemFury
-Make sure you have an account on GemFury and it has been made a collaborator of the TMXCredit corporate account, then run:
-
-    rake gemfury:push
-
 ##Copyright
 
-Copyright (c) 2011 TMX Credit, released under the MIT license
+Copyright (c) 2013 TMX Credit, released under the MIT license

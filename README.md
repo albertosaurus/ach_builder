@@ -48,4 +48,4 @@ with similar functionality
 
 ##Copyright
 
-Copyright (c) 2011 TMX Credit, released under the MIT license
+Copyright (c) 2013 TMX Credit, released under the MIT license

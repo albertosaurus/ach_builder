@@ -8,8 +8,8 @@ gem 'rspec'
 gem 'gemfury', :require => false
 
 group :development, :test do
-  gem "rcov", :require => false, :platform => :ruby_18
-  gem "simplecov", :require => false, :platform => :mri_19
-  gem 'simplecov-rcov-text', :require => false, :platform => :mri_19
-  gem 'metrical', :require => false
+  gem 'rspec'
+
+  gem "simplecov"          , :require => false
+  gem 'simplecov-rcov-text', :require => false
 end

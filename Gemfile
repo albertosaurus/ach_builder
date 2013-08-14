@@ -1,4 +1,5 @@
-source "http://rubygems.org"
+source "https://rubygems.org"
+
 
 # Specify your gem's dependencies in ach_builder.gemspec
 gem 'i18n'

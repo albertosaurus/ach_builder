@@ -5,7 +5,6 @@ source "https://rubygems.org"
 gem 'i18n'
 gemspec
 gem 'rspec'
-gem 'gemfury', :require => false
 
 group :development, :test do
   gem 'rspec'

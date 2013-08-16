@@ -4,13 +4,9 @@
 
 Ruby helper for creating ACH files. Its API is designed to be as flexible as possible.
 
-Inspired by
-
-[ach](http://github.com/jm81/ach) - Ruby helper
-
-[ACH::Builder](http://github.com/camerb/ACH-Builder) - Perl module
-
-with similar functionality
+Inspired by:
+* [ach](http://github.com/jm81/ach) - Ruby helper
+* [ACH::Builder](http://github.com/camerb/ACH-Builder) - Perl module
 
 ##Example
 

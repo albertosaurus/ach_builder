@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = ACH::VERSION
   s.authors     = ["TMX Credit", "Artem Kuzko", "Sergey Potapov"]
   s.email       = ["rubygems@tmxcredit.com", "AKuzko@sphereconsultinginc.com", "SPotapov@sphereconsultinginc.com"]
-  s.homepage    = "http://github.com/akuzko/ach_builder"
+  s.homepage    = "https://github.com/TMXCredit/ach_builder"
   s.summary     = "Ruby tools for building ACH files"
   s.description = "Ruby tools for building ACH (Automated Clearing House) files"
 

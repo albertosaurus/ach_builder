@@ -1,0 +1,10 @@
+language: ruby
+script: "rake spec"
+rvm:
+  - 1.9.3
+  - 2.0.0
+notifications:
+  email:
+    - rubygems@tmxcredit.com
+    - AKuzko@sphereconsultinginc.com
+    - SPotapov@sphereconsultinginc.com

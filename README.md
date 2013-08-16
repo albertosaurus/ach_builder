@@ -1,5 +1,7 @@
 #ACH-Builder
 
+[![Build Status](https://secure.travis-ci.org/TMXCredit/ach_builder.png)](http://travis-ci.org/TMXCredit/ach_builder)
+
 Ruby helper for creating ACH files. Its API is designed to be as flexible as possible.
 
 Inspired by

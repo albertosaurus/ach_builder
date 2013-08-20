@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = ACH::VERSION
   s.authors     = ["TMX Credit", "Artem Kuzko", "Sergey Potapov"]
   s.email       = ["rubygems@tmxcredit.com", "AKuzko@sphereconsultinginc.com", "SPotapov@sphereconsultinginc.com"]
-  s.homepage    = "http://github.com/akuzko/ach_builder"
+  s.homepage    = "https://github.com/TMXCredit/ach_builder"
   s.summary     = "Ruby tools for building ACH files"
   s.description = "Ruby tools for building ACH (Automated Clearing House) files"
 
@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
+  s.licenses      = ['MIT']
 
   s.add_development_dependency "rspec"    , ">= 2.0.0"
   s.add_runtime_dependency "activesupport", ">= 2.3.0"

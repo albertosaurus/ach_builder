@@ -8,6 +8,7 @@ gem 'rspec'
 
 group :development, :test do
   gem 'rspec'
+  gem 'yard'
 
   gem "simplecov"          , :require => false
   gem 'simplecov-rcov-text', :require => false

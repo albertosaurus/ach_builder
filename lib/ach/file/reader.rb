@@ -7,10 +7,16 @@ module ACH
   class File::Reader
     include Constants
 
+    # Initialize reader.
+    #
+    # @param [#each] enum
     def initialize(enum)
       @enum = enum
     end
 
+    # Build a {ACH::File} object using data obtained from +@enum+ source.
+    #
+    # @return [ACH::File]
     def to_ach
       header_line, batch_lines, control_line = ach_data
 
@@ -39,6 +45,9 @@ module ACH
       end
     end
 
+    # Process the source and return header batch and control records.
+    #
+    # @return [Array<ACH::Record::Base, Array>]
     def ach_data
       process! unless processed?
 
@@ -46,6 +55,10 @@ module ACH
     end
     private :ach_data
 
+    # Process each line by iterating over strings in +@enum+ source one by one and
+    # generating ACH information corresponding to record line.
+    #
+    # @return [true]
     def process!
       each_line do |record_type, line|
         case record_type
@@ -68,11 +81,16 @@ module ACH
     end
     private :process!
 
+    # Return +true+ if +@enum+ has been processed.
+    #
+    # @return [Boolean]
     def processed?
       !!@processed
     end
     private :processed?
 
+    # Iterate over +enum+ and yield first symbol of the string as
+    # record type and string itself.
     def each_line
       @enum.each do |line|
         yield line[0..0].to_i, line.chomp
@@ -80,21 +98,34 @@ module ACH
     end
     private :each_line
 
+    # Return array of batches in hash representation.
+    #
+    # @return [Array<Hash>]
     def batches
       @batches ||= []
     end
     private :batches
 
+    # Add a new hash representation of a batch to the batch list
+    # to be filled out during processing.
+    #
+    # @return [Array<Hash>]
     def initialize_batch!
       batches << {:entries => [], :addendas => {}}
     end
     private :initialize_batch!
 
+    # Current (the last one) batch to fill.
+    #
+    # @return [Hash]
     def current_batch
       batches.last
     end
     private :current_batch
 
+    # Current (the last one) entry string of the last batch that was processed.
+    #
+    # @return [String]
     def current_entry
       current_batch[:entries].last
     end

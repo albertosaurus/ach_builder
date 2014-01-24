@@ -11,6 +11,8 @@ module ACH
     # Initializes instance with formatting data. Parses passed string for formatting
     # values, such as width, justification, etc. As the result, builds a Proc object
     # that will be used to format passed string according to formatting rule.
+    #
+    # @param [ACH::Formatter::Rule] rule
     def initialize(rule)
       just, width, pad, transf = rule.match(RULE_PARSER_REGEX)[1..-1]
       @length    = width.to_i

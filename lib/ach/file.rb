@@ -47,6 +47,9 @@ module ACH
 
     # Opens a +filename+ and passes it's handler to the ACH::Reader object, which uses it as
     # enum to scan for ACH contents line by line.
+    #
+    # @param [String] filename
+    # @return [ACH::File]
     def self.read(filename)
       ::File.open(filename) do |fh|
         Reader.new(fh).to_ach

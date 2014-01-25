@@ -1,5 +1,5 @@
 module ACH
-  # Every field should be formatted with its own rule so Formatter take care about it.
+  # Ensures that every field is formatted with its own rule.
   # Rules are defined in ACH::RULES constant.
   #
   # == Rule Format
@@ -80,40 +80,62 @@ module ACH
       :entry_details_sequence_num => '->7'
     }
 
-    # Returns +true+ if +field_name+ is one of the keys of +RULES+
+    # Return +true+ if +field_name+ is one of the keys of +RULES+.
+    #
+    # @param [Symbol] field_name
+    # @return [Boolean]
     def self.defined?(field_name)
       RULES.key?(field_name)
     end
 
-    # Adds +field+ with corresponding +format+ to +RULES+
+    # Add a +field+ with corresponding +format+ to +RULES+.
+    #
+    # @param [Symbol] field
+    # @param [String] format
+    # @return [Hash]
     def self.define(field, format)
       RULES[field] = format
     end
 
-    # If missing method name is one of the defined rules, passes its name
-    # and the rest of arguments to the +format+ method
+    # If missing method name is one of the defined rules, pass its name
+    # and the rest of arguments to the +format+ method.
+    #
+    # @param [Symbol] meth
+    # @param [*Object] args
     def self.method_missing(meth, *args)
       self.defined?(meth) ? format(meth, *args) : super
     end
 
-    # Formats +value+ using the rule defined by +field_name+ format
+    # Format the +value+ using the rule defined by +field_name+ format.
+    #
+    # @param [Symbol] field_name
+    # @param [String] value
+    # @return [String]
     def self.format(field_name, value)
       rule_for_field(field_name).call(value)
     end
 
-    # Returns ACH::Formatter::Rule rule, built from the corresponding format
-    # definition of a +field+
+    # Return ACH::Formatter::Rule rule, built from the corresponding format
+    # definition of a +field+.
+    #
+    # @param [Symbol] field
+    # @return [ACH::Formatter::Rule]
     def self.rule_for_field(field)
       compiled_rules[field] ||= Rule.new(RULES[field])
     end
 
-    # Returns a hash of all rules that have been built at the moment of method call
+    # Return a hash of all rules that have been built at the moment of method call.
+    #
+    # @return [Hash]
     def self.compiled_rules
       @compiled_rules ||= {}
     end
 
-    # Returns a regular expression that can be used to split string into matched parts,
-    # that will correspond to passed +fields+ parameter. Used for ACH reading purposes
+    # Return a regular expression that can be used to split string into matched parts,
+    # that will correspond to passed +fields+ parameter. Used for ACH reading purposes.
+    #
+    # @param [Array<Symbol>] fields
+    # @return [Regexp]
     def self.matcher_for(fields)
       /^#{fields.map{ |f| "(.{#{rule_for_field(f).length}})" }.join}$/
     end

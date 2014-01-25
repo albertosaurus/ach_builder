@@ -1,3 +1,4 @@
 module ACH
-  VERSION = "0.2.1"
+  # Gem version
+  VERSION = "0.2.2"
 end

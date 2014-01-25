@@ -19,7 +19,11 @@ module ACH
 
     # Exception raised on attempt to assign a value to nonexistent field.
     class UnknownAttributeError < ArgumentError
-      def initialize field, obj
+      # Initialize error with field and component.
+      #
+      # @param [String] field
+      # @param [ACH::Component] obj
+      def initialize(field, obj)
         super "Unrecognized attribute '#{field}' for #{obj}"
       end
     end
@@ -31,6 +35,9 @@ module ACH
 
     attr_reader :attributes
 
+    # When inherited, clone class-related properties.
+    #
+    # @param [Class] klass
     def self.inherited(klass)
       klass.default_attributes = default_attributes.dup
       klass.after_initialize_hooks = after_initialize_hooks.dup
@@ -46,6 +53,9 @@ module ACH
     # header record.
     #
     # Note that default values may be overwritten when building records.
+    #
+    # @param [Symbol] meth
+    # @param [*Object] args
     def self.method_missing(meth, *args)
       if Formatter.defined?(meth)
         default_attributes[meth] = args.first
@@ -54,16 +64,28 @@ module ACH
       end
     end
 
-    def initialize(fields = {}, &block)
-      @attributes = {}.merge(self.class.default_attributes)
+    # Initialize component with field values. If block is given, it is evaluated in context
+    # of component, allowing setting fields via method calls and declarations of nested
+    # components.
+    #
+    # @param [Hash] fields
+    # @raise [UnknownAttributeError]
+    def initialize(fields = {})
+      @attributes = self.class.default_attributes.dup
       fields.each do |name, value|
         raise UnknownAttributeError.new(name, self) unless Formatter.defined?(name)
         @attributes[name] = value
       end
       after_initialize
-      instance_eval(&block) if block
+      instance_eval(&Proc.new) if block_given?
     end
 
+    # Missing messages are treated as accessor methods for a component if their
+    # message name is defined by {ACH::Formatter}.
+    #
+    # @param [Symbol] meth
+    # @param [*Object] args
+    # @return [String]
     def method_missing(meth, *args)
       if Formatter.defined?(meth)
         args.empty? ? @attributes[meth] : (@attributes[meth] = args.first)
@@ -72,7 +94,9 @@ module ACH
       end
     end
 
-    def before_header # :nodoc:
+    # Hook that is called whenever component header record is created. To be
+    # overridden in subclasses.
+    def before_header
     end
     private :before_header
 
@@ -92,19 +116,26 @@ module ACH
     # == Example 3
     #
     #   header # => just returns a header object
-    def header(fields = {}, &block)
+    def header(fields = {})
       before_header
       merged_fields = fields_for(self.class::Header).merge(fields)
       @header ||= self.class::Header.new(merged_fields)
       @header.tap do |head|
-        head.instance_eval(&block) if block
+        head.instance_eval(&Proc.new) if block_given?
       end
     end
 
-    def build_header(str) # :nodoc:
+    # Build a component (+File+ or +Batch+) related +Header+ record from a given string.
+    #
+    # @param [String] str
+    # @return [ACH::Record::Base]
+    def build_header(str)
       @header = self.class::Header.from_s(str)
     end
 
+    # Build a component-related +Control+ record.
+    #
+    # @return [ACH::Record::Base]
     def control
       @control ||= begin
         klass  = self.class::Control
@@ -113,10 +144,19 @@ module ACH
       end
     end
 
-    def build_control(str) # :nodoc:
+    # Build a component-related +Control+ record from a given string.
+    #
+    # @param [String] str
+    # @return [ACH::Record::Base]
+    def build_control(str)
       @control = self.class::Control.from_s(str)
     end
-    
+
+    # Return a set of fields, that is a subset of +attributes+ that can be used to
+    # initialize an instance of a +klass+. +Component+ uses +attributes+ itself.
+    #
+    # @param [Class] klass
+    # @return [Hash]
     def fields_for(klass)
       if klass < Component
         attributes
@@ -126,11 +166,13 @@ module ACH
       end
     end
 
-    def after_initialize # :nodoc:
+    # Execute all +Proc+ objects contained in the +after_initialize_hooks+
+    # array in the context of the object.
+    def after_initialize
       self.class.after_initialize_hooks.each{ |hook| instance_exec(&hook) }
     end
     
-    # Creates has many association.
+    # Creates a has_many association.
     #
     # == Example
     #
@@ -147,6 +189,9 @@ module ACH
     # The example above extends File with #batches and #batch instance methods:
     # * #batch is used to add new instance of Batch.
     # * #batches is used to get an array of batches which belong to file.
+    #
+    # @param [Symbol] plural_name
+    # @param [Hash] options
     def self.has_many(plural_name, options = {})
       association = HasManyAssociation.new(plural_name, options)
 

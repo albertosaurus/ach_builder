@@ -22,6 +22,11 @@ module ACH
   autoload :Batch
   autoload :File
 
+  # For a given string, try to locate the corresponding constant
+  # (apparently Class) under the {ACH} or {ACH::Record} modules.
+  #
+  # @param [String] name
+  # @return [Object]
   def self.to_const(name)
     [self, self::Record].detect{ |mod| mod.const_defined?(name) }.const_get(name)
   end

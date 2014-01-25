@@ -22,8 +22,9 @@ module ACH
   module File::TransmissionHeader
     extend ActiveSupport::Concern
 
-    # Raised when (descendant of) ACH File tries to redeclare it's +TransmissionHeader+ 
+    # Raised when (descendant of) ACH File tries to redeclare it's +TransmissionHeader+.
     class RedefinedTransmissionHeaderError < RuntimeError
+      # Initialize error with descriptive message.
       def initialize
         super "TransmissionHeader record may be defined only once"
       end
@@ -31,13 +32,19 @@ module ACH
 
     # Raised when +TransmissionHeader+ is declared with no fields in it
     class EmptyTransmissionHeaderError < RuntimeError
+      # Initialize error with descriptive message.
       def initialize
         super "Transmission_header should declare it's fields"
       end
     end
 
+    # Class macros.
     module ClassMethods
-      # Defines and declares +TransmissionHeader+ class within scope of +self+
+      # Defines and declares +TransmissionHeader+ class within scope of +self+.
+      #
+      # @return [Boolean]
+      # @raise [RedefinedTransmissionHeaderError]
+      # @raise [EmptyTransmissionHeaderError]
       def transmission_header(&block)
         raise RedefinedTransmissionHeaderError if have_transmission_header?
 
@@ -50,27 +57,34 @@ module ACH
       end
 
       # Returns +true+ if +TransmissionHeader+ is defined within scope of the class.
+      #
+      # @return [Boolean]
       def have_transmission_header?
         @have_transmission_header
       end
     end
 
     # Helper instance method. Returns +true+ if +TransmissionHeader+ is defined within
-    # scope of it's class
+    # scope of it's class.
+    #
+    # @return [Boolean]
     def have_transmission_header?
       self.class.have_transmission_header?
     end
 
     # Builds +TransmissionHeader+ record for self. Yields it to +block+, if passed.
     # Returns nil if no +TransmissionHeader+ is defined within scope of class.
-    def transmission_header(fields = {}, &block)
+    #
+    # @param [Hash] fields
+    # @return [ACH::File::TransmissionHeader]
+    def transmission_header(fields = {})
       return nil unless have_transmission_header?
 
       merged_fields = fields_for(self.class::TransmissionHeader).merge(fields)
 
       @transmission_header ||= self.class::TransmissionHeader.new(merged_fields)
       @transmission_header.tap do |head|
-        head.instance_eval(&block) if block
+        head.instance_eval(&Proc.new) if block_given?
       end
     end
   end

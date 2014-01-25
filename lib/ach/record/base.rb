@@ -51,7 +51,7 @@ module ACH
         end
       end
 
-      # Specifies fields of the record. Order is important. All fields
+      # Specify the fields of the record. Order is important. All fields
       # must be declared in ACH::Formatter +RULES+. See class description
       # for example.
       #
@@ -63,7 +63,7 @@ module ACH
         @fields.each{ |field| define_field_methods(field) }
       end
 
-      # Sets default values for fields. See class description for example.
+      # Set default values for fields. See class description for example.
       #
       # @param [Hash, nil] default_values
       # @return [Hash]
@@ -73,7 +73,7 @@ module ACH
       end
 
       # Define accessor methods for a given field name if it can be found
-      # in keys of {ACH::Formatter::RULES}.
+      # in the keys of {ACH::Formatter::RULES}.
       #
       # @param [Symbol] field
       # @raise [UnknownFieldError]
@@ -109,7 +109,7 @@ module ACH
         instance_eval(&Proc.new) if block_given?
       end
 
-      # Builds a string from record object.
+      # Build a string from record object.
       #
       # @return [Stirng]
       # @raise [EmptyFieldError]
@@ -120,7 +120,7 @@ module ACH
         end.join
       end
 
-      # Returns a hash where key is field's name and value is field's value.
+      # Return a hash where key is the field's name and value is the field's value.
       #
       # @return [Hash]
       def fields

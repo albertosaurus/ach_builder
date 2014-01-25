@@ -22,8 +22,8 @@ module ACH
   autoload :Batch
   autoload :File
 
-  # For a given string, try to locate corresponding constant (appearantly Class) under
-  # {ACH} or {ACH::Record} modules.
+  # For a given string, try to locate the corresponding constant
+  # (apparently Class) under the {ACH} or {ACH::Record} modules.
   #
   # @param [String] name
   # @return [Object]

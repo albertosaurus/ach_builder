@@ -8,9 +8,10 @@ module ACH
 
     attr_reader :length
 
-    # Initializes instance with formatting data. Parses passed string for formatting
-    # values, such as width, justification, etc. As the result, builds a Proc object
-    # that will be used to format passed string according to formatting rule.
+    # Initialize the instance with the formatting data. Parses the given string
+    # for formatting values, such as width, justification, etc. With the result,
+    # it builds a Proc object to be used to format the given string according
+    # to the formatting rule.
     #
     # @param [ACH::Formatter::Rule] rule
     def initialize(rule)

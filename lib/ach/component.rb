@@ -19,7 +19,7 @@ module ACH
 
     # Exception raised on attempt to assign a value to nonexistent field.
     class UnknownAttributeError < ArgumentError
-      # Initialize error with field and component
+      # Initialize error with field and component.
       #
       # @param [String] field
       # @param [ACH::Component] obj
@@ -95,7 +95,7 @@ module ACH
     end
 
     # Hook that is called whenever component header record is created. To be
-    # overriden in subclasses.
+    # overridden in subclasses.
     def before_header
     end
     private :before_header
@@ -152,8 +152,8 @@ module ACH
       @control = self.class::Control.from_s(str)
     end
 
-    # Return a set of fields, that is subset of +attributes+ that can be used to
-    # initialize instance of a +klass+. +Component+ uses +attributes+ itself.
+    # Return a set of fields, that is a subset of +attributes+ that can be used to
+    # initialize an instance of a +klass+. +Component+ uses +attributes+ itself.
     #
     # @param [Class] klass
     # @return [Hash]
@@ -166,13 +166,13 @@ module ACH
       end
     end
 
-    # Execute all +Proc+ objects contained in +after_initialize_hooks+ array in context
-    # of object.
+    # Execute all +Proc+ objects contained in the +after_initialize_hooks+
+    # array in the context of the object.
     def after_initialize
       self.class.after_initialize_hooks.each{ |hook| instance_exec(&hook) }
     end
     
-    # Creates has many association.
+    # Creates a has_many association.
     #
     # == Example
     #

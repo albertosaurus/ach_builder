@@ -25,7 +25,7 @@ module ACH
     # created after Entry records. Each new Addenda record will be attached
     # to the latest Entry record.
     class NoLinkError < ArgumentError
-      # Initialize error with descriptinve message.
+      # Initialize the error with a descriptive message.
       #
       # @param [String] link
       # @param [Class] klass
@@ -37,7 +37,7 @@ module ACH
     # Exception thrown if an association object, assigned for particular
     # owner object, is used to assign to another owner object
     class DoubleAssignmentError < StandardError
-      # Initialize error with descriptinve message
+      # Initialize the error with a descriptive message.
       #
       # @param [String] name
       # @param [ACH::Component] owner
@@ -49,7 +49,7 @@ module ACH
     attr_reader :name, :linked_to, :proc_defaults
     private :linked_to, :proc_defaults
 
-    # Initialize association with plural name and options.
+    # Initialize the association with a plural name and options.
     #
     # @param [String] plural_name
     # @param [Hash] options
@@ -60,7 +60,7 @@ module ACH
       @linked_to, @proc_defaults = options.values_at(:linked_to, :proc_defaults)
     end
 
-    # Clones +self+ and assigns +owner+ to clone. Also, for newly created
+    # Clone +self+ and assign +owner+ to clone. Also, for newly created
     # clone association that has owner, aliases main methods so that +owner+
     # may delegate to them.
     #
@@ -80,7 +80,7 @@ module ACH
       end
     end
 
-    # Returns an array of methods to be delegated by +owner+ of the association.
+    # Return an array of methods to be delegated by +owner+ of the association.
     # For example, for association named :items, it will include:
     # * +build_item+ - for instantiating Item from the string (used by parsing functionality)
     # * +item+ - for instantiating Item during common ACH File creation
@@ -91,7 +91,7 @@ module ACH
       ["build_#{singular_name}", singular_name, name]
     end
 
-    # Uses <tt>klass#from_s</tt> to instantiate object from a string. Thus, +klass+ should be
+    # Use <tt>klass#from_s</tt> to instantiate object from a string. Thus, +klass+ should be
     # descendant of ACH::Record::Base. Then pushes object to appropriate container.
     #
     # @param [String] str
@@ -101,8 +101,8 @@ module ACH
       container_for_associated << obj
     end
 
-    # Creates associated object using common to ACH controls pattern, and pushes it to
-    # appropriate container. For example, for :items association, this method is
+    # Create an associated object using common to ACH controls pattern, and push it to
+    # an appropriate container. For example, for :items association, this method is
     # aliased to +item+, so you will have:
     #
     #   item(:code => 'WEB') do
@@ -123,7 +123,7 @@ module ACH
       end
     end
 
-    # Returns main container for association. For plain (without :linked_to option), it is
+    # Return the main container for association. For plain (without :linked_to option), it is
     # array. For linked associations, it is a hash, which keys are records from linking
     # associations, and values are arrays for association's objects.
     #
@@ -132,10 +132,11 @@ module ACH
       @container ||= linked? ? {} : []
     end
 
-    # Returns array for associated object to be pushed in. For plain associations, it is
-    # equivalent to +container+. For linked associations, uses +@owner+ and linking
-    # association's name to get the latest record from linking associations. If it does
-    # not exist, +NoLinkError+ will be raised.
+    # Return an array onto which the associated object may be be pushed. For
+    # plain associations, it is equivalent to +container+. For linked
+    # associations, uses +@owner+ and linking association's name to get the
+    # latest record from linking associations. If it does not exist,
+    # +NoLinkError+ will be raised.
     #
     # Example:
     #   class Batch < ACH::Component
@@ -163,7 +164,7 @@ module ACH
       container[last_link] ||= []
     end
 
-    # Returns +true+ if association is linked to another association (thus, it's records must
+    # Return +true+ if the association is linked to another association (thus, its records must
     # be preceded by other association's records). Returns +false+ otherwise.
     #
     # @return [Boolean]
@@ -172,7 +173,7 @@ module ACH
     end
     private :linked?
 
-    # Returns +klass+ that corresponds to association name. Should be defined either in
+    # Return +klass+ that corresponds to the association name. Should be defined either in
     # ACH module, or in ACH::Record module.
     #
     # @return [Class]
@@ -181,7 +182,7 @@ module ACH
     end
     private :klass
 
-    # Returns singular name of the association.
+    # Return the singular name of the association.
     #
     # @return [String]
     def singular_name

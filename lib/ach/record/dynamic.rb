@@ -25,7 +25,7 @@ module ACH
     # Note: passing two arguments to method call is equivalent to
     # passing a hash with a single key-value pair.
     class Dynamic < Base
-      # Error raised on re-definition of Dynamic record
+      # Error raised on re-definition of Dynamic record.
       class DuplicateFormatError < ArgumentError
         # Initialize error with descriptive message.
         #

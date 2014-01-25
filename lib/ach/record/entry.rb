@@ -38,15 +38,15 @@ module ACH
         :addenda            => 0,
         :bank_15            => ''
 
-      # Return +true+ if +self+ is not credit record.
+      # Return +true+ if +self+ is not a credit record.
       #
       # @return [Boolean]
       def debit?
         !credit?
       end
 
-      # Return +true+ if second digit of a value of the +transaction_code+ field
-      # is one of +CREDIT_TRANSACTION_CODE_ENDING_DIGITS+
+      # Return +true+ if the second digit of a value of the +transaction_code+ field
+      # is one of +CREDIT_TRANSACTION_CODE_ENDING_DIGITS+.
       #
       # @return [Boolean]
       def credit?
